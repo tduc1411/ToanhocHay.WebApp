@@ -1,14 +1,17 @@
 ﻿using System.Text.Json;
 using System.Text;
 using ToanHocHay.WebApp.Models.DTOs;
+using ToanHocHay.WebApp.Common.Constants;
 
 namespace ToanHocHay.WebApp.Services
 {
     public class ExamApiService
     {
         private readonly HttpClient _httpClient;
+
         // Đảm bảo Port 7290 khớp với Backend của bạn
-        private readonly string _apiBaseUrl = "https://localhost:7290/api";
+        //private readonly string _apiBaseUrl = "https://localhost:7290/api";
+
         private readonly JsonSerializerOptions _jsonOptions;
 
         public ExamApiService(HttpClient httpClient)
@@ -20,7 +23,7 @@ namespace ToanHocHay.WebApp.Services
         // 1. Lấy đề thi (Giữ nguyên)
         public async Task<ExerciseDetailDto?> GetExerciseById(int id)
         {
-            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/exercises/{id}");
+            var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/exercises/{id}");
             if (!response.IsSuccessStatusCode) return null;
 
             var json = await response.Content.ReadAsStringAsync();
@@ -50,7 +53,7 @@ namespace ToanHocHay.WebApp.Services
             var json = JsonSerializer.Serialize(payload);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_apiBaseUrl}/ExerciseAttempts/start", content);
+            var response = await _httpClient.PostAsync($"{ApiConstant.apiBaseUrl}/ExerciseAttempts/start", content);
             if (!response.IsSuccessStatusCode) return 0;
 
             var resString = await response.Content.ReadAsStringAsync();
@@ -64,7 +67,7 @@ namespace ToanHocHay.WebApp.Services
         {
             var json = JsonSerializer.Serialize(dto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"{_apiBaseUrl}/ExerciseAttempts/submit-answer", content);
+            var response = await _httpClient.PostAsync($"{ApiConstant.apiBaseUrl}/ExerciseAttempts/submit-answer", content);
             return response.IsSuccessStatusCode;
         }
 
@@ -74,12 +77,12 @@ namespace ToanHocHay.WebApp.Services
             var payload = new CompleteExerciseDto { AttemptId = attemptId };
             var json = JsonSerializer.Serialize(payload);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"{_apiBaseUrl}/ExerciseAttempts/complete", content);
+            var response = await _httpClient.PostAsync($"{ApiConstant.apiBaseUrl}/ExerciseAttempts/complete", content);
             return response.IsSuccessStatusCode;
         }
         public async Task<ExerciseResultDto?> GetExerciseResult(int attemptId)
         {
-            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/ExerciseAttempts/{attemptId}/result");
+            var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/ExerciseAttempts/{attemptId}/result");
             if (!response.IsSuccessStatusCode) return null;
 
             var json = await response.Content.ReadAsStringAsync();
