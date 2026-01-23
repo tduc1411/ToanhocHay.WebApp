@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToanHocHay.WebApp.Models.DTOs;
 using ToanHocHay.WebApp.Services;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
@@ -20,113 +19,159 @@ namespace ToanHocHay.WebApp.Controllers
             _logger = logger;
         }
 
-        // 1. Xử lý đường dẫn /Account/Login
+        // ================= LOGIN =================
         [HttpGet]
         public IActionResult Login()
         {
-            ViewBag.Mode = "login"; // Báo cho View hiển thị form đăng nhập
-            ViewBag.Error = null;
-            ViewBag.Email = null;
-            return View(); // Tự động tìm file Views/Account/Login.cshtml
+            if (User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
+            ViewBag.Mode = "login";
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> LoginAsync(string email, string password)
         {
-            _logger.LogInformation("Login attempt with email: {Email}", email);
-            var (data, error) = await _authService.Login(new LoginRequestDto
-            {
-                Email = email,
-                Password = password
-            });
-
-            /*_logger.LogInformation("UserType enum value: {Value}, Name: {Name}", 
-                (int)data.UserType,
-                data.UserType.ToString()
-                );*/
-
+            var (data, error) = await _authService.Login(new LoginRequestDto { Email = email, Password = password });
 
             if (error != null)
             {
-                _logger.LogWarning("Login failed for email: {Email}. Reason: {Reason}", email, error);
-
                 ViewBag.Error = error;
                 ViewBag.Mode = "login";
                 ViewBag.Email = email;
-                return View();
+                return View("Login");
             }
-
-            //_logger.LogInformation("Login success. UserId: {UserId}, Email: {Email}, Role: {Role}", data!.UserId, data.Email, data.UserType);
 
             // LƯU SESSION (giữ JWT cho API)
             HttpContext.Session.SetString("JWT", data!.Token);
-            HttpContext.Session.SetInt32("UserId", data!.UserId);
-            HttpContext.Session.SetString("Email", data.Email);
-            HttpContext.Session.SetString("UserType", data.UserType.ToString());
+            HttpContext.Session.SetInt32("UserId", data.UserId);
 
-            // COOKIE AUTHENTICATION (QUAN TRỌNG)
+            // COOKIE AUTHENTICATION
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, data.UserId.ToString()),
-                new Claim(ClaimTypes.Name, data.Email),          // dùng hiển thị header
+                new Claim(ClaimTypes.Name, data.FullName),
                 new Claim(ClaimTypes.Email, data.Email),
                 new Claim(ClaimTypes.Role, data.UserType.ToString())
             };
 
-            if (data.StudentId.HasValue)
+            if (data.StudentId.HasValue) claims.Add(new Claim(CustomJwtClaims.StudentId, data.StudentId.Value.ToString()));
+            if (data.ParentId.HasValue) claims.Add(new Claim(CustomJwtClaims.ParentId, data.ParentId.Value.ToString()));
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties
             {
-                claims.Add(new Claim(CustomJwtClaims.StudentId, data.StudentId.Value.ToString()));
-            }
-
-            if (data.ParentId.HasValue)
-            {
-                claims.Add(new Claim(CustomJwtClaims.ParentId, data.ParentId.Value.ToString()));
-            }
-
-            var identity = new ClaimsIdentity(
-                claims,
-                CookieAuthenticationDefaults.AuthenticationScheme
-            );
-
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal,
-                new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
-                }
-            );
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            });
 
             return RedirectToAction("Index", "Home");
         }
 
-        // 2. Xử lý đường dẫn /Account/Register
+        // ================= REGISTER =================
         [HttpGet]
         public IActionResult Register()
         {
-            ViewBag.Mode = "register"; // Báo cho View hiển thị form đăng ký
-            return View("Login"); // Tái sử dụng file Login.cshtml
+            ViewBag.Mode = "register";
+            return View("Login");
         }
 
         [HttpPost]
-        public IActionResult Register(string fullName, string email, string password, string role)
+        public async Task<IActionResult> Register(string fullName, string email, string password, string role)
         {
-            // Logic tạo tài khoản sẽ viết ở đây
-            return RedirectToAction("Index", "Home");
+            int userTypeInt = (role.ToLower() == "student") ? 0 : 1;
+
+            var request = new RegisterRequestDto
+            {
+                FullName = fullName,
+                Email = email,
+                Password = password,
+                ConfirmPassword = password,
+                UserType = userTypeInt,
+                GradeLevel = (userTypeInt == 0) ? 6 : null
+            };
+
+            var (success, error) = await _authService.Register(request);
+            if (!success)
+            {
+                ViewBag.Error = error;
+                ViewBag.Mode = "register";
+                return View("Login");
+            }
+
+            TempData["SuccessMsg"] = "Đăng ký thành công! Vui lòng kiểm tra email xác thực.";
+            return RedirectToAction("Login");
         }
 
-        // 3. Xử lý đường dẫn /Account/Logout
-        public async Task<IActionResult> LogoutAsync()
+        // ================= PROFILE =================
+        [HttpGet]
+        public async Task<IActionResult> Profile()
         {
-            await HttpContext.SignOutAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr)) return RedirectToAction("Login");
+
+            // Lấy thông tin mới nhất từ API (Giải pháp C)
+            var userProfile = await _authService.GetProfileAsync(int.Parse(userIdStr));
+            if (userProfile == null) return RedirectToAction("Login");
+
+            return View(userProfile);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto model)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr)) return RedirectToAction("Login");
+
+            var response = await _authService.UpdateProfileAsync(int.Parse(userIdStr), model);
+
+            if (response.Success)
+            {
+                // CẬP NHẬT IDENTITY NGAY LẬP TỨC (Giải pháp B)
+                var identity = (ClaimsIdentity)User.Identity;
+                var nameClaim = identity.FindFirst(ClaimTypes.Name);
+                if (nameClaim != null) identity.RemoveClaim(nameClaim);
+                identity.AddClaim(new Claim(ClaimTypes.Name, model.FullName));
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity),
+                    new AuthenticationProperties { IsPersistent = true }
                 );
 
-            HttpContext.Session.Clear();
+                TempData["Success"] = "Cập nhật thông tin thành công!";
+            }
+            else
+            {
+                ViewBag.Error = response.Message;
+            }
+            return RedirectToAction("Profile");
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto model)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr)) return RedirectToAction("Login");
+
+            var response = await _authService.ChangePasswordAsync(int.Parse(userIdStr), model);
+
+            if (response.Success)
+            {
+                TempData["Success"] = "Đổi mật khẩu thành công!";
+                return RedirectToAction("Profile");
+            }
+
+            ViewBag.Error = response.Message;
+            // Load lại profile để hiển thị view
+            var userProfile = await _authService.GetProfileAsync(int.Parse(userIdStr));
+            return View("Profile", userProfile);
+        }
+
+        // ================= LOGOUT =================
+        public async Task<IActionResult> LogoutAsync()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
         }
     }

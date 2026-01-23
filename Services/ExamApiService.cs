@@ -1,109 +1,76 @@
-﻿using System.Text.Json;
-using System.Text;
-using ToanHocHay.WebApp.Models.DTOs;
+﻿using System.Net.Http.Json;
 using ToanHocHay.WebApp.Common.Constants;
+using ToanHocHay.WebApp.Models.DTOs;
 
 namespace ToanHocHay.WebApp.Services
 {
     public class ExamApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly JsonSerializerOptions _jsonOptions;
 
         public ExamApiService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
         // Lấy danh sách bài kiểm tra
         public async Task<List<ExerciseDto>> GetExercisesAsync()
         {
-            var response = await _httpClient.GetAsync(
-                $"{ApiConstant.apiBaseUrl}/api/Exercises");
-
-            if (!response.IsSuccessStatusCode)
-                return new List<ExerciseDto>();
-
-            var json = await response.Content.ReadAsStringAsync();
-
-            var apiResponse =
-                JsonSerializer.Deserialize<ApiResponse<List<ExerciseDto>>>(
-                    json, _jsonOptions);
-
-            return apiResponse?.Data ?? new List<ExerciseDto>();
+            try
+            {
+                var apiResponse = await _httpClient.GetFromJsonAsync<ApiResponse<List<ExerciseDto>>>($"{ApiConstant.apiBaseUrl}/api/Exercises");
+                return apiResponse?.Data ?? new List<ExerciseDto>();
+            }
+            catch { return new List<ExerciseDto>(); }
         }
 
-
-        // 1. Lấy đề thi (Giữ nguyên)
+        // 1. Lấy chi tiết đề thi
         public async Task<ExerciseDetailDto?> GetExerciseById(int id)
         {
-            var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/exercises/{id}");
-            if (!response.IsSuccessStatusCode) return null;
-
-            var json = await response.Content.ReadAsStringAsync();
-
-            // Thử giải nén theo cấu trúc bọc ApiResponse
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<ExerciseDetailDto>>(json, _jsonOptions);
-
-            if (apiResponse?.Data != null)
+            try
             {
-                // Kiểm tra xem Questions có bị rỗng do lệch tên trường không
-                if (apiResponse.Data.Questions == null || apiResponse.Data.Questions.Count == 0)
-                {
-                    // Nếu rỗng, thử giải nén lại với giả định tên trường là 'exerciseQuestions'
-                    // Bạn có thể tạm thời sửa file ExerciseDetailDto.cs thuộc tính Questions 
-                    // thành [JsonPropertyName("exerciseQuestions")] để test nhanh.
-                }
-                return apiResponse.Data;
+                var apiResponse = await _httpClient.GetFromJsonAsync<ApiResponse<ExerciseDetailDto>>($"{ApiConstant.apiBaseUrl}/api/exercises/{id}");
+                return apiResponse?.Data;
             }
-
-            return null;
+            catch { return null; }
         }
 
         // 2. Bắt đầu làm bài (Lấy AttemptId)
         public async Task<int> StartExercise(int exerciseId, int studentId)
         {
-            var payload = new StartExerciseDto { ExerciseId = exerciseId, StudentId = studentId };
-            var json = JsonSerializer.Serialize(payload);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var payload = new { ExerciseId = exerciseId, StudentId = studentId };
+            var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/start", payload);
 
-            var response = await _httpClient.PostAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/start", content);
             if (!response.IsSuccessStatusCode) return 0;
 
-            var resString = await response.Content.ReadAsStringAsync();
-            var apiResult = JsonSerializer.Deserialize<ApiResponse<ExerciseAttemptResponseDto>>(resString, _jsonOptions);
-
+            var apiResult = await response.Content.ReadFromJsonAsync<ApiResponse<ExerciseAttemptResponseDto>>();
             return apiResult?.Data?.AttemptId ?? 0;
         }
 
         // 3. Nộp từng câu trả lời
         public async Task<bool> SubmitSingleAnswer(SubmitAnswerRequestDto dto)
         {
-            var json = JsonSerializer.Serialize(dto);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/submit-answer", content);
+            var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/submit-answer", dto);
             return response.IsSuccessStatusCode;
         }
 
         // 4. Hoàn thành bài thi
         public async Task<bool> CompleteExercise(int attemptId)
         {
-            var payload = new CompleteExerciseDto { AttemptId = attemptId };
-            var json = JsonSerializer.Serialize(payload);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/complete", content);
+            var payload = new { AttemptId = attemptId };
+            var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/complete", payload);
             return response.IsSuccessStatusCode;
         }
+
+        // 5. Lấy kết quả sau khi hoàn thành
         public async Task<ExerciseResultDto?> GetExerciseResult(int attemptId)
         {
-            var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/{attemptId}/result");
-            if (!response.IsSuccessStatusCode) return null;
-
-            var json = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<ExerciseResultDto>>(json, _jsonOptions);
-
-            return apiResponse?.Data;
+            try
+            {
+                var apiResponse = await _httpClient.GetFromJsonAsync<ApiResponse<ExerciseResultDto>>($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/{attemptId}/result");
+                return apiResponse?.Data;
+            }
+            catch { return null; }
         }
     }
 }
