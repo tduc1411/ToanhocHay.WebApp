@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ToanHocHay.WebApp.Models.DTOs;
-using ToanHocHay.WebApp.Services;
-
+﻿using System.Net.Http;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using ToanHocHay.WebApp.Common;
+using ToanHocHay.WebApp.Common.Constants;
+using ToanHocHay.WebApp.Models.DTOs;
+using ToanHocHay.WebApp.Services;
 
 namespace ToanHocHay.WebApp.Controllers
 {
@@ -13,11 +15,13 @@ namespace ToanHocHay.WebApp.Controllers
     {
         private readonly AuthApiService _authService;
         private readonly ILogger<AccountController> _logger;
+        private readonly HttpClient _httpClient;
 
-        public AccountController(AuthApiService authService, ILogger<AccountController> logger)
+        public AccountController(AuthApiService authService, ILogger<AccountController> logger, IHttpClientFactory httpClientFactory)
         {
             _authService = authService;
             _logger = logger;
+            _httpClient = httpClientFactory.CreateClient();
         }
 
         // 1. Xử lý đường dẫn /Account/Login
@@ -128,6 +132,35 @@ namespace ToanHocHay.WebApp.Controllers
             HttpContext.Session.Clear();
 
             return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return View("ConfirmEmailFailed");
+            }
+
+            // Gọi API backend
+            var response = await _httpClient.GetAsync(
+                $"{ApiConstant.apiBaseUrl}/api/auth/confirm-email?token={token}"
+            );
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return View("ConfirmEmailFailed");
+            }
+
+            var result = await response.Content
+                .ReadFromJsonAsync<ApiResponse<bool>>();
+
+            if (result == null || !result.Success)
+            {
+                return View("ConfirmEmailFailed");
+            }
+
+            return View("ConfirmEmailSuccess");
+
         }
     }
 }
