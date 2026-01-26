@@ -1,326 +1,145 @@
 ﻿@{
-    ViewData["Title"] = "Bài giảng";
+    ViewData["Title"] = "Hệ thống Bài giảng";
 }
 
-<section class="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white py-16 overflow-hidden">
+@* --- 1. HERO SECTION --- *@
+<section class="relative bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white py-16 overflow-hidden">
     <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white opacity-10 rounded-full blur-[100px] animate-pulse"></div>
+
     <div class="container mx-auto px-4 relative z-10">
         <div class="max-w-4xl">
-            <span class="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-bold px-4 py-2 rounded-full mb-4 border border-white/30">
-                <i class="fa-solid fa-book-open mr-1"></i> Hệ thống bài giảng
+            <span class="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-black px-4 py-2 rounded-full mb-6 border border-white/30 tracking-widest uppercase">
+                <i class="fa-solid fa-graduation-cap mr-2"></i> Hệ sinh thái ToanHocHay
             </span>
-            <h1 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">
-                Khám phá kho bài giảng Toán học
+            <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+                Chinh phục Toán học <br />
+                <span class="text-yellow-300">Theo lộ trình riêng</span>
             </h1>
-            <p class="text-base text-blue-100 leading-relaxed max-w-2xl">
-                Hơn 500+ bài giảng chất lượng cao, được biên soạn bởi đội ngũ giáo viên giỏi,
-                bám sát chương trình SGK mới nhất.
+            <p class="text-lg md:text-xl text-blue-100 max-w-2xl leading-relaxed font-medium">
+                Hệ thống bài giảng AI cá nhân hóa giúp bạn lấp đầy lỗ hổng kiến thức
+                và tối ưu hóa thời gian học tập chỉ trong 2 tháng.
             </p>
         </div>
     </div>
 </section>
 
-<section class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+@* --- 2. THANH ĐIỀU KHIỂN (Search & Sort) --- *@
+@* FIX: Tăng top lên để không bị Header chính che mất. 
+   Nếu vẫn bị che, bro hãy tăng số 72px lên thành 80px hoặc 90px *@
+<section class="bg-white border-b border-gray-100 sticky top-[125px] z-40 shadow-sm transition-all duration-300">
     <div class="container mx-auto px-4 py-4">
         <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-
-            <div class="w-full md:w-1/2">
-                <div class="relative">
-                    <input type="text" placeholder="Tìm kiếm bài học..."
-                           class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm">
-                    <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                </div>
+            <div class="w-full md:w-1/2 relative group">
+                <input type="text" id="lessonSearch" onkeyup="filterLessons()" placeholder="Tìm tên bài học..."
+                       class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold text-sm">
+                <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
             </div>
 
-            <div class="flex gap-2 w-full md:w-auto">
-                <select class="px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-600 outline-none text-sm bg-white cursor-pointer">
-                    <option>Sắp xếp</option>
-                    <option>Mới nhất</option>
-                    <option>Phổ biến nhất</option>
-                    <option>Tên A-Z</option>
+            <div class="flex gap-4 w-full md:w-auto">
+                <select id="sortOrder" onchange="sortLessons()" class="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white outline-none text-sm font-black text-slate-700 cursor-pointer shadow-sm">
+                    <option value="default">Sắp xếp: Mặc định</option>
+                    <option value="az">Tên bài học: A-Z</option>
                 </select>
             </div>
         </div>
     </div>
 </section>
 
-<section class="container mx-auto px-4 py-8">
-    <div class="flex flex-col lg:flex-row gap-8">
+<section class="container mx-auto px-4 py-12">
+    <div class="flex flex-col lg:flex-row gap-10">
 
+        @* --- 3. BỘ LỌC SIDEBAR --- *@
         <aside class="w-full lg:w-1/4">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
-                <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-4">
-                    <h3 class="font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-filter"></i>
-                        Bộ lọc
+            @* FIX: Tăng top lên [170px] để nó nằm dưới thanh Search *@
+            <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-gray-100 overflow-hidden sticky top-[170px] z-30">
+                <div class="bg-slate-900 text-white p-6">
+                    <h3 class="font-black flex items-center gap-3 uppercase text-[10px] tracking-[0.2em]">
+                        <i class="fa-solid fa-sliders text-blue-400"></i> Lọc thông minh
                     </h3>
                 </div>
 
-                <div class="p-4 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-
+                <div class="p-8 space-y-10">
                     <div>
-                        <h4 class="font-bold text-sm text-gray-700 mb-3 uppercase tracking-wide">Độ khó</h4>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
-                                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition">
-                                    <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span>
-                                    Cơ bản
-                                </span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
-                                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition">
-                                    <span class="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-1"></span>
-                                    Trung bình
-                                </span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
-                                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition">
-                                    <span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span>
-                                    Nâng cao
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <hr class="border-gray-200">
-
-                    <div>
-                        <h4 class="font-bold text-sm text-gray-700 mb-3 uppercase tracking-wide">Trạng thái</h4>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
-                                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition">Đã hoàn thành</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
-                                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition">Đang học</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
-                                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition">Chưa học</span>
-                            </label>
+                        <h4 class="font-black text-[10px] text-slate-400 mb-5 uppercase tracking-widest flex justify-between">
+                            Độ khó <i class="fa-solid fa-chevron-down"></i>
+                        </h4>
+                        <div class="space-y-4" id="difficultyFilters">
+                            @{
+                                var difficulties = new[] {
+                                                        new { id = "Easy", label = "Cơ bản", color = "bg-green-500" },
+                                                        new { id = "Medium", label = "Trung bình", color = "bg-yellow-500" },
+                                                        new { id = "Hard", label = "Nâng cao", color = "bg-red-500" }
+                                                        };
+                            }
+                            @foreach (var item in difficulties)
+                            {
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" value="@item.id" onchange="filterLessons()"
+                                           class="difficulty-checkbox w-6 h-6 text-blue-600 rounded-lg border-gray-200">
+                                    <span class="text-sm font-black text-slate-600 group-hover:text-blue-600 flex items-center transition">
+                                        <span class="w-2 h-2 rounded-full @item.color mr-2"></span> @item.label
+                                    </span>
+                                </label>
+                            }
                         </div>
                     </div>
                 </div>
 
-                <div class="p-4 border-t border-gray-200">
-                    <button class="w-full text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-lg transition text-sm">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> Đặt lại bộ lọc
+                <div class="p-6 bg-slate-50">
+                    <button onclick="resetFilters()" class="w-full bg-white text-slate-900 hover:bg-slate-900 hover:text-white font-black py-4 rounded-2xl transition-all text-xs uppercase tracking-widest border border-slate-200 shadow-sm">
+                        Làm mới bộ lọc
                     </button>
                 </div>
             </div>
         </aside>
 
+        @* --- 4. DANH SÁCH BÀI HỌC --- *@
         <main class="flex-1">
-
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 mb-6 border border-blue-100">
-                <div class="flex items-center justify-between">
+            <div class="bg-blue-50 rounded-[2rem] p-6 mb-10 border border-blue-100 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
+                        <i class="fa-solid fa-bullseye text-xl"></i>
+                    </div>
                     <div>
-                        <p class="text-sm text-gray-600">Tìm thấy <strong class="text-blue-600">120 bài học</strong> phù hợp</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500">Tiến độ:</span>
-                        <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-green-400 to-green-600" style="width: 35%"></div>
-                        </div>
-                        <span class="text-xs font-bold text-green-600">35%</span>
+                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-[0.1em]">Mục tiêu hôm nay</p>
+                        <p class="text-sm text-slate-700 font-bold">Tìm thấy <span id="found-count" class="text-blue-600">0</span> bài học phù hợp</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-5 cursor-pointer hover:from-blue-600 hover:to-indigo-600 transition" onclick="toggleChapter('chapter1')">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-book"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold">Chương 1: Tập hợp số tự nhiên</h3>
-                                <p class="text-sm text-blue-100 mt-1">12 bài học • 6h 30min • Đã hoàn thành 4/12</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right hidden md:block">
-                                <div class="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
-                                    <div class="h-full bg-green-400" style="width: 33%"></div>
+            <div id="chapter-container">
+                @* Chapter 1 (Mẫu) *@
+                <div class="chapter-block bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-gray-100 mb-10 overflow-hidden group">
+                    <div class="bg-white p-8 cursor-pointer border-b border-gray-50 hover:bg-slate-50 transition" onclick="toggleChapter('chapter1')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-6">
+                                <div class="w-16 h-16 bg-blue-600 text-white rounded-3xl flex items-center justify-center text-2xl shadow-lg shadow-blue-200">
+                                    <i class="fa-solid fa-layer-group"></i>
                                 </div>
-                                <p class="text-xs text-blue-100 mt-1">33% hoàn thành</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-down transition-transform" id="chapter1-icon"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="chapter1" class="divide-y divide-gray-100">
-
-                    <a href="/Course/Lesson/1" class="block p-5 hover:bg-blue-50 transition group">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-check text-green-600"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-start justify-between mb-1">
-                                    <h4 class="font-bold text-gray-800 group-hover:text-blue-600 transition">
-                                        1. Làm quen với số nguyên âm
-                                    </h4>
-                                    <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold ml-2">Đã học</span>
-                                </div>
-                                <div class="flex items-center gap-4 text-xs text-gray-500">
-                                    <span><i class="fa-regular fa-clock mr-1"></i> 08:30</span>
-                                    <span><i class="fa-solid fa-signal mr-1"></i> Cơ bản</span>
-                                    <span><i class="fa-regular fa-eye mr-1"></i> 1,234 lượt xem</span>
+                                <div>
+                                    <h3 class="text-2xl font-black text-slate-900 tracking-tight">Chương 1: Tập hợp số tự nhiên</h3>
+                                    <p class="text-sm text-slate-400 font-bold mt-1">12 bài học • Hoàn thành 4/12</p>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-
-                    <a href="/Course/Lesson/2" class="block p-5 hover:bg-blue-50 transition group bg-blue-50/30">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 relative">
-                                <i class="fa-solid fa-play text-blue-600"></i>
-                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-blue-600 rounded-full animate-ping"></span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-start justify-between mb-1">
-                                    <h4 class="font-bold text-gray-800 group-hover:text-blue-600 transition">
-                                        2. Phép cộng số nguyên
-                                    </h4>
-                                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold ml-2">Đang học</span>
-                                </div>
-                                <div class="flex items-center gap-4 text-xs text-gray-500 mb-2">
-                                    <span><i class="fa-regular fa-clock mr-1"></i> 12:15</span>
-                                    <span><i class="fa-solid fa-signal mr-1"></i> Cơ bản</span>
-                                    <span><i class="fa-regular fa-eye mr-1"></i> 2,456 lượt xem</span>
-                                </div>
-                                <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500" style="width: 65%"></div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">Đã học 65%</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <div class="block p-5 bg-gray-50 opacity-60 cursor-not-allowed">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-lock text-gray-400"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-start justify-between mb-1">
-                                    <h4 class="font-bold text-gray-500">
-                                        3. Phép trừ số nguyên
-                                    </h4>
-                                    <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded font-bold ml-2">Chưa mở</span>
-                                </div>
-                                <div class="flex items-center gap-4 text-xs text-gray-400">
-                                    <span><i class="fa-regular fa-clock mr-1"></i> 15:00</span>
-                                    <span><i class="fa-solid fa-signal mr-1"></i> Trung bình</span>
-                                </div>
-                            </div>
+                            <i class="fa-solid fa-chevron-down text-xl text-slate-300 transition-transform duration-500" id="chapter1-icon"></i>
                         </div>
                     </div>
 
-                    <div class="block p-5 bg-gray-50 opacity-60 cursor-not-allowed">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-lock text-gray-400"></i>
+                    <div id="chapter1" class="divide-y divide-gray-50 lesson-list">
+                        <div class="lesson-card p-6 flex items-center gap-6 group/lesson hover:bg-blue-50/30 transition-all" data-difficulty="Easy" data-name="Bài 1">
+                            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid fa-check-double"></i>
                             </div>
                             <div class="flex-1">
-                                <div class="flex items-start justify-between mb-1">
-                                    <h4 class="font-bold text-gray-500">
-                                        4. Quy tắc dấu ngoặc
-                                    </h4>
-                                    <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded font-bold ml-2">Chưa mở</span>
-                                </div>
-                                <div class="flex items-center gap-4 text-xs text-gray-400">
-                                    <span><i class="fa-regular fa-clock mr-1"></i> 12:00</span>
-                                    <span><i class="fa-solid fa-signal mr-1"></i> Trung bình</span>
-                                </div>
+                                <h4 class="font-black text-slate-800 text-lg group-hover/lesson:text-blue-600 transition">1. Làm quen với số nguyên âm</h4>
+                                <p class="text-[11px] font-black text-slate-400 uppercase">Cơ bản • 08:30</p>
                             </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-                <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-5 cursor-pointer hover:from-purple-600 hover:to-pink-600 transition" onclick="toggleChapter('chapter2')">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-book"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold">Chương 2: Số nguyên</h3>
-                                <p class="text-sm text-purple-100 mt-1">10 bài học • 5h 45min • Chưa bắt đầu</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right hidden md:block">
-                                <div class="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
-                                    <div class="h-full bg-yellow-400" style="width: 0%"></div>
-                                </div>
-                                <p class="text-xs text-purple-100 mt-1">0% hoàn thành</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-down transition-transform" id="chapter2-icon"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="chapter2" class="hidden divide-y divide-gray-100">
-                    <div class="block p-5 bg-gray-50 opacity-60">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-lock text-gray-400"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-500">1. Tập hợp số nguyên</h4>
-                                <div class="flex items-center gap-4 text-xs text-gray-400 mt-1">
-                                    <span><i class="fa-regular fa-clock mr-1"></i> 10:30</span>
-                                    <span><i class="fa-solid fa-signal mr-1"></i> Cơ bản</span>
-                                </div>
-                            </div>
+                            <a href="/Course/Learning/1" class="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase opacity-0 group-hover/lesson:opacity-100 transition-all">Xem lại</a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-                <div class="bg-gradient-to-r from-green-500 to-teal-500 text-white p-5 cursor-pointer hover:from-green-600 hover:to-teal-600 transition" onclick="toggleChapter('chapter3')">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-shapes"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold">Chương 3: Hình học trực quan</h3>
-                                <p class="text-sm text-green-100 mt-1">8 bài học • 4h 20min • Chưa bắt đầu</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right hidden md:block">
-                                <div class="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
-                                    <div class="h-full bg-yellow-400" style="width: 0%"></div>
-                                </div>
-                                <p class="text-xs text-green-100 mt-1">0% hoàn thành</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-down transition-transform" id="chapter3-icon"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="chapter3" class="hidden divide-y divide-gray-100">
-                    <div class="p-5 text-center text-gray-500">
-                        <i class="fa-solid fa-lock text-3xl mb-2 text-gray-300"></i>
-                        <p class="text-sm">Hoàn thành Chương 2 để mở khóa</p>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
 </section>
@@ -330,7 +149,6 @@
         function toggleChapter(chapterId) {
             const element = document.getElementById(chapterId);
             const icon = document.getElementById(chapterId + '-icon');
-
             if (element.classList.contains('hidden')) {
                 element.classList.remove('hidden');
                 icon.style.transform = 'rotate(180deg)';
@@ -339,5 +157,35 @@
                 icon.style.transform = 'rotate(0deg)';
             }
         }
+
+        function filterLessons() {
+            const searchQuery = document.getElementById('lessonSearch').value.toLowerCase();
+            const selectedDifficulties = Array.from(document.querySelectorAll('.difficulty-checkbox:checked')).map(cb => cb.value);
+            const lessons = document.querySelectorAll('.lesson-card');
+            let foundCount = 0;
+
+            lessons.forEach(lesson => {
+                const difficulty = lesson.getAttribute('data-difficulty');
+                const name = lesson.getAttribute('data-name').toLowerCase();
+                const matchSearch = name.includes(searchQuery);
+                const matchDifficulty = selectedDifficulties.length === 0 || selectedDifficulties.includes(difficulty);
+
+                if (matchSearch && matchDifficulty) {
+                    lesson.style.display = 'flex';
+                    foundCount++;
+                } else {
+                    lesson.style.display = 'none';
+                }
+            });
+            document.getElementById('found-count').innerText = foundCount;
+        }
+
+        function resetFilters() {
+            document.getElementById('lessonSearch').value = '';
+            document.querySelectorAll('.difficulty-checkbox').forEach(cb => cb.checked = false);
+            filterLessons();
+        }
+
+        window.onload = filterLessons;
     </script>
 }
