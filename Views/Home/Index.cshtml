@@ -129,7 +129,7 @@
             Công nghệ dẫn đầu
         </span>
         <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">
-            Hệ thống Học & Đánh giá <span class="text-blue-600">Thông minh</span>
+            Hệ thống Học & <span class="text-blue-600 whitespace-nowrap">Đánh giá Thông minh</span>
         </h2>
         <div class="h-1.5 w-24 bg-blue-600 rounded-full mx-auto mb-6"></div>
         <p class="text-slate-500 text-lg leading-relaxed">
@@ -275,9 +275,10 @@
 </section>
 
 <section class="container mx-auto px-4 py-20">
-    @* --- Header Section --- *@
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-        <div class="max-w-2xl">
+    @* --- Header Section: Đã căn giữa --- *@
+    <div class="flex flex-col items-center justify-center text-center mb-12 gap-6">
+        <div class="max-w-3xl mx-auto">
+            @* Thêm mx-auto để đảm bảo khối văn bản luôn ở giữa *@
             <span class="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest mb-4 border border-blue-100">
                 Tin tức & Sự kiện
             </span>
@@ -286,6 +287,8 @@
             </h2>
             <p class="text-slate-500 mt-4 text-lg">Thông báo mới nhất và mẹo học toán thú vị từ đội ngũ chuyên gia.</p>
         </div>
+
+        @* Nút xem tất cả cũng sẽ tự động xuống hàng và căn giữa nhờ flex-col + items-center *@
         <a href="#" class="group inline-flex items-center gap-2 text-blue-600 font-black hover:text-blue-700 transition-all text-sm pb-2 border-b-2 border-blue-100 hover:border-blue-600">
             Xem tất cả tin tức
             <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
@@ -401,7 +404,7 @@
                     <p class="text-sm text-slate-500 mb-8 max-w-[240px] leading-relaxed">
                         Bám sát chương trình SGK mới nhất, học đúng trọng tâm.
                     </p>
-                    <button onclick="openPaymentModal('standard')" class="text-white bg-[#2563EB] text-sm font-black px-8 py-3.5 rounded-2xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all transform hover:scale-105 active:scale-95">
+                    <button onclick="togglePricingModal()" class="text-white bg-[#2563EB] text-sm font-black px-8 py-3.5 rounded-2xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all transform hover:scale-105 active:scale-95">
                         Đăng ký học ngay
                     </button>
                 </div>
@@ -425,7 +428,7 @@
                     <p class="text-sm text-slate-500 mb-8 max-w-[240px] leading-relaxed">
                         Tổng hợp 50 đề thi thử chất lượng cao từ các trường chuyên danh tiếng.
                     </p>
-                    <button onclick="togglePricingModal()" class="text-white bg-purple-600 text-sm font-black px-8 py-3.5 rounded-2xl shadow-lg shadow-purple-500/30 hover:bg-purple-700 transition-all transform hover:scale-105 active:scale-95">
+                    <button onclick="window.location.href='/Exam'" class="text-white bg-purple-600 text-sm font-black px-8 py-3.5 rounded-2xl shadow-lg shadow-purple-500/30 hover:bg-purple-700 transition-all transform hover:scale-105 active:scale-95">
                         Thử sức ngay
                     </button>
                 </div>

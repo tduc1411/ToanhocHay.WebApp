@@ -125,17 +125,24 @@
                             <div class="grid md:grid-cols-2 gap-8 mb-8">
                                 <div>
                                     <label class="block text-xs font-black uppercase tracking-widest mb-3 text-gray-400">Địa chỉ Email</label>
-                                    <input type="email" placeholder="example@@gmail.com" class="w-full bg-gray-50 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 transition-all border font-medium">
+                                    <input type="email" placeholder="example@gmail.com" class="w-full bg-gray-50 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 transition-all border font-medium">
                                 </div>
+
                                 <div>
                                     <label class="block text-xs font-black uppercase tracking-widest mb-3 text-gray-400">Vấn đề cần hỗ trợ</label>
-                                    <select class="w-full bg-gray-50 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 transition-all border cursor-pointer font-bold text-gray-700 appearance-none">
-                                        <option>Tư vấn khóa học</option>
-                                        <option>Lỗi kỹ thuật / Đăng nhập</option>
-                                        <option>Thanh toán & Hóa đơn</option>
-                                        <option>Hợp tác / Đối tác</option>
-                                        <option>Khác</option>
-                                    </select>
+                                    <div class="relative">
+                                        <select id="main-issue" class="w-full bg-gray-50 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 transition-all border cursor-pointer font-bold text-gray-700 appearance-none">
+                                            <option value="none">Chọn vấn đề...</option>
+                                            <option value="consult">Tư vấn khóa học</option>
+                                            <option value="tech">Lỗi kỹ thuật / Đăng nhập</option>
+                                            <option value="billing">Thanh toán & Hóa đơn</option>
+                                            <option value="partner">Hợp tác / Đối tác</option>
+                                            <option value="other">Khác</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gray-400">
+                                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

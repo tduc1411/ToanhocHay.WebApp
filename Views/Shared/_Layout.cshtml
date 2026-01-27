@@ -23,18 +23,28 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .group:hover .dropdown-menu,
-        .group\/sub:hover .dropdown-submenu {
+        .group:hover .dropdown-menu {
             visibility: visible;
             opacity: 1;
             transform: translateY(0);
         }
 
+        /* --- Sửa lại phần Submenu của bạn ở đây --- */
         .dropdown-submenu {
             visibility: hidden;
             opacity: 0;
-            transform: translateX(-10px);
+            transform: translateX(10px); /* Đẩy nhẹ từ phải qua */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            left: 100%; /* Đưa sang bên phải */
+            top: 0;
+            padding-left: 8px; /* Tạo khoảng đệm nhỏ */
+        }
+
+        .group\/sub:hover > .dropdown-submenu {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(0);
         }
 
         /* Gradient text effect */
@@ -64,16 +74,16 @@
             position: relative;
         }
 
-            .nav-item-active::after {
-                content: '';
-                position: absolute;
-                bottom: -2px;
-                left: 0;
-                right: 0;
-                height: 3px;
-                background: linear-gradient(90deg, #2563EB, #3B82F6);
-                border-radius: 2px 2px 0 0;
-            }
+        .nav-item-active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563EB, #3B82F6);
+            border-radius: 2px 2px 0 0;
+        }
 
         /* Mobile menu toggle */
         .mobile-menu {
@@ -82,19 +92,19 @@
             transition: max-height 0.3s ease-out;
         }
 
-            .mobile-menu.active {
-                max-height: 500px;
-            }
+        .mobile-menu.active {
+            max-height: 500px;
+        }
 
         /* Subtle animation for footer social icons */
         .social-icon {
             transition: all 0.3s ease;
         }
 
-            .social-icon:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
-            }
+        .social-icon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
     </style>
     <script>
         tailwind.config = {
@@ -133,11 +143,10 @@
         }
     }
 
-    <header class="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100">
+    <header class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
         <div class="container mx-auto px-4 py-3">
             <div class="flex gap-8 items-center">
 
-                <!-- Logo -->
                 <a asp-controller="Home" asp-action="Index" class="flex-shrink-0 block z-10 hover:scale-105 transition duration-300">
                     <img src="~/images/brand/logo_header.png"
                          asp-append-version="true"
@@ -145,12 +154,9 @@
                          class="h-16 md:h-20 w-auto object-contain" />
                 </a>
 
-                <!-- Main Navigation Area -->
                 <div class="flex-1 flex flex-col justify-between pb-1">
 
-                    <!-- Top Bar: Search & User Actions -->
                     <div class="flex items-center justify-between gap-6 pt-1 mb-3">
-                        <!-- Search Bar -->
                         <div class="flex-1 max-w-2xl relative mx-auto">
                             <input type="text"
                                    placeholder="Tìm kiếm khóa học, bài giảng, đề thi..."
@@ -160,7 +166,6 @@
                             </button>
                         </div>
 
-                        <!-- User Actions -->
                         <div class="flex items-center gap-3 flex-shrink-0">
                             <div class="h-6 w-px bg-gray-200 mx-1 hidden md:block"></div>
 
@@ -177,62 +182,40 @@
                                         <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform group-hover:rotate-180"></i>
                                     </button>
 
-                                    <!-- Enhanced Dropdown -->
                                     <div class="dropdown-menu absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                                        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
-                                            <p class="text-white font-bold text-sm">@User.Identity.Name</p>
-                                            <p class="text-blue-100 text-xs">Học viên</p>
+                                        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3 text-white font-bold text-sm">
+                                            @User.Identity.Name
                                         </div>
-                                        <a href="/Student/Profile" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-primary transition-all duration-200">
-                                            <i class="fa-solid fa-user w-5"></i>
-                                            <span>Hồ sơ cá nhân</span>
+                                        <a href="/Student/Profile" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-blue-50 transition-all">
+                                            <i class="fa-solid fa-user w-5"></i> Hồ sơ
                                         </a>
-                                        <a href="/Student/Dashboard" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-primary transition-all duration-200">
-                                            <i class="fa-solid fa-chart-line w-5"></i>
-                                            <span>Bảng điều khiển</span>
-                                        </a>
-                                        <a href="/Student/MyCourses" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-primary transition-all duration-200">
-                                            <i class="fa-solid fa-graduation-cap w-5"></i>
-                                            <span>Khóa học của tôi</span>
-                                        </a>
-                                        <div class="border-t border-gray-100 my-1"></div>
-                                        <a href="/Account/Logout" class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-200">
-                                            <i class="fa-solid fa-right-from-bracket w-5"></i>
-                                            <span>Đăng xuất</span>
+                                        <a href="/Account/Logout" class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                                            <i class="fa-solid fa-right-from-bracket w-5"></i> Đăng xuất
                                         </a>
                                     </div>
                                 </div>
                             }
                             else
                             {
-                                <a href="/Account/Register" class="px-6 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all duration-300 hover:shadow-md hover:border-blue-700">
-                                    Đăng Ký
-                                </a>
-                                <a href="/Account/Login" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                                    Đăng Nhập
-                                </a>
+                                <a href="/Account/Register" class="px-6 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all duration-300">Đăng Ký</a>
+                                <a href="/Account/Login" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">Đăng Nhập</a>
                             }
                         </div>
                     </div>
 
-                    <!-- Main Navigation -->
                     <nav class="overflow-visible pt-1 w-full pl-32 md:pl-40">
                         <ul class="flex justify-start gap-12 items-center text-sm md:text-base font-bold">
                             <li>
                                 <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2 transition-all duration-200 pb-2 @IsActive("Home", "Index")">
-                                    <i class="fa-solid fa-house"></i>
-                                    <span>Trang chủ</span>
+                                    <i class="fa-solid fa-house"></i> <span>Trang chủ</span>
                                 </a>
                             </li>
-
                             <li>
                                 <a asp-controller="Home" asp-action="About" class="flex items-center gap-2 transition-all duration-200 pb-2 @IsActive("Home", "About")">
-                                    <i class="fa-solid fa-circle-info"></i>
-                                    <span>Giới thiệu</span>
+                                    <i class="fa-solid fa-circle-info"></i> <span>Giới thiệu</span>
                                 </a>
                             </li>
 
-                            <!-- Mega Menu for Courses -->
                             <li class="relative group">
                                 <a href="/Course" class="flex items-center gap-2 transition-all duration-200 cursor-pointer pb-2 @IsActive("Course")">
                                     <i class="fa-solid fa-book-open"></i>
@@ -240,58 +223,50 @@
                                     <i class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-300 group-hover:rotate-180"></i>
                                 </a>
 
-                                <!-- Enhanced Mega Dropdown -->
-                                <ul class="dropdown-menu absolute left-0 top-full mt-3 w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl z-50 py-3 overflow-hidden before:absolute before:-top-3 before:left-0 before:w-full before:h-3 before:bg-transparent">
+                                <ul class="dropdown-menu absolute left-0 top-full mt-3 w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl z-50 py-3 before:absolute before:-top-3 before:left-0 before:w-full before:h-3 before:bg-transparent">
                                     <div class="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 mb-2">
                                         <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Chọn môn học</p>
                                     </div>
 
-                                    <!-- Đại số -->
-                                    <li class="relative group/sub hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
-                                        <a href="#" class="px-5 py-3.5 flex justify-between items-center text-sm font-semibold text-gray-700 group-hover/sub:text-primary w-full">
+                                    <li class="relative group/sub">
+                                        <a href="#" class="px-5 py-3.5 flex justify-between items-center text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-primary transition-all duration-200">
                                             <span class="flex items-center gap-3">
                                                 <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
                                                     <i class="fa-solid fa-calculator text-blue-600"></i>
                                                 </div>
                                                 <span>Đại số</span>
                                             </span>
-                                            <i class="fa-solid fa-chevron-right text-xs text-gray-400 transition-transform group-hover/sub:translate-x-1"></i>
+                                            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
                                         </a>
 
-                                        <!-- Submenu -->
-                                        <ul class="dropdown-submenu absolute left-full top-0 ml-2 w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 before:absolute before:top-0 before:-left-2 before:w-2 before:h-full before:bg-transparent">
+                                        <ul class="dropdown-submenu w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 before:absolute before:top-0 before:-left-4 before:w-4 before:h-full before:bg-transparent">
                                             <div class="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 mb-2">
                                                 <p class="text-xs font-bold text-blue-700 uppercase tracking-wider">Chương trình Đại số</p>
                                             </div>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 1: Số tự nhiên</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 2: Số nguyên</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 3: Số hữu tỉ</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 4: Số thực</a></li>
+                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary transition-all"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 1: Số tự nhiên</a></li>
+                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 2: Số nguyên</a></li>
                                         </ul>
                                     </li>
 
                                     <div class="h-px bg-gray-100 my-2"></div>
 
-                                    <!-- Hình học -->
-                                    <li class="relative group/sub hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 transition-all duration-200">
-                                        <a href="#" class="px-5 py-3.5 flex justify-between items-center text-sm font-semibold text-gray-700 group-hover/sub:text-orange-600 w-full">
+                                    <li class="relative group/sub">
+                                        <a href="#" class="px-5 py-3.5 flex justify-between items-center text-sm font-semibold text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200">
                                             <span class="flex items-center gap-3">
                                                 <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
                                                     <i class="fa-solid fa-shapes text-orange-600"></i>
                                                 </div>
                                                 <span>Hình học</span>
                                             </span>
-                                            <i class="fa-solid fa-chevron-right text-xs text-gray-400 transition-transform group-hover/sub:translate-x-1"></i>
+                                            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
                                         </a>
 
-                                        <ul class="dropdown-submenu absolute left-full top-0 ml-2 w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 before:absolute before:top-0 before:-left-2 before:w-2 before:h-full before:bg-transparent">
+                                        <ul class="dropdown-submenu w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 before:absolute before:top-0 before:-left-4 before:w-4 before:h-full before:bg-transparent">
                                             <div class="px-4 py-2 bg-gradient-to-r from-orange-50 to-amber-50 mb-2">
                                                 <p class="text-xs font-bold text-orange-700 uppercase tracking-wider">Chương trình Hình học</p>
                                             </div>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Hình học trực quan</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Tam giác & Tứ giác</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Quan hệ song song</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Hình học không gian</a></li>
+                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Hình học trực quan</a></li>
+                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Tam giác & Tứ giác</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -299,25 +274,17 @@
 
                             <li>
                                 <a asp-controller="Exam" asp-action="Index" class="flex items-center gap-2 transition-all duration-200 pb-2 @IsActive("Exam")">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                    <span>Kiểm tra</span>
+                                    <i class="fa-solid fa-pen-to-square"></i> <span>Kiểm tra</span>
                                 </a>
                             </li>
-
                             <li>
                                 <a asp-controller="Home" asp-action="Contact" class="flex items-center gap-2 transition-all duration-200 pb-2 @IsActive("Home", "Contact")">
-                                    <i class="fa-solid fa-phone"></i>
-                                    <span>Liên hệ</span>
+                                    <i class="fa-solid fa-phone"></i> <span>Liên hệ</span>
                                 </a>
                             </li>
                         </ul>
                     </nav>
                 </div>
-
-                <!-- Mobile Menu Toggle (for responsive) -->
-                <button class="md:hidden text-gray-600 hover:text-primary text-xl">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
             </div>
         </div>
     </header>
@@ -326,7 +293,6 @@
         @RenderBody()
     </main>
 
-    <!-- Enhanced Footer -->
     <footer class="bg-gradient-to-br from-[#1e3a5f] via-[#2a4074] to-[#1e3a5f] text-white pt-16 pb-8 mt-auto relative overflow-hidden">
         <!-- Decorative elements -->
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400"></div>
@@ -421,8 +387,101 @@
             </div>
         </div>
     </footer>
+    <div id="chatbot-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
+        <div id="chat-window" class="hidden mb-4 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
+            <div class="bg-primary p-4 flex justify-between items-center text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Hỗ trợ ToanHocHay</p>
+                        <p class="text-[10px] text-blue-100 italic">Thường trả lời ngay lập tức</p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="hover:bg-white/10 w-8 h-8 rounded-full transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="h-96 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3" id="chat-messages">
+                <div class="flex gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-primary text-xs flex-shrink-0">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-gray-700 max-w-[80%]">
+                        Chào bạn! Mình là trợ lý ảo của ToanHocHay. Bạn cần hỗ trợ gì về các khóa học Toán lớp 6 không?
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-gray-100">
+                <div class="relative">
+                    <input type="text" placeholder="Nhập câu hỏi của bạn..."
+                           class="w-full pl-4 pr-12 py-3 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all outline-none">
+                    <button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="toggleChat()" id="chat-toggle-btn" class="w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:shadow-primary/40 hover:scale-110 transition-all duration-300 flex items-center justify-center relative">
+            <i class="fa-solid fa-comment-dots text-2xl" id="chat-icon"></i>
+            <span class="absolute top-0 right-0 w-4 h-4 bg-red-500 border-2 border-white rounded-full"></span>
+        </button>
+    </div>
+    <style>
+        /* Hiệu ứng mở cửa sổ chat */
+        #chat-window.active {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Animation cho tin nhắn mới */
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #chat-messages > div {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+    </style>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            const chatIcon = document.getElementById('chat-icon');
+
+            if (chatWindow.classList.contains('hidden')) {
+                // Mở chat
+                chatWindow.classList.remove('hidden');
+                setTimeout(() => {
+                    chatWindow.classList.add('active');
+                }, 10);
+                chatIcon.classList.remove('fa-comment-dots');
+                chatIcon.classList.add('fa-chevron-down');
+            } else {
+                // Đóng chat
+                chatWindow.classList.remove('active');
+                setTimeout(() => {
+                    chatWindow.classList.add('hidden');
+                }, 300);
+                chatIcon.classList.remove('fa-chevron-down');
+                chatIcon.classList.add('fa-comment-dots');
+            }
+        }
+    </script>
 </body>
 </html>
