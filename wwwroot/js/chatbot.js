@@ -3,9 +3,74 @@
     const chatInput = document.getElementById('chat-input');
     const chatSendBtn = document.getElementById('chat-send-btn');
 
+    // --- TRIGGER TRACKING ---
+    let hasUserInteracted = false;
+    let triggersSent = {
+        page_load: false,
+        wait_15s: false,
+        scroll_70: false
+    };
+
+    // --- 0. TRIGGER: PAGE LOAD ---
+    async function triggerPageLoad() {
+        if (triggersSent.page_load) return;
+        
+        const response = await fetch('/Chat/Trigger', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trigger: 'page_load' })
+        });
+
+        const data = await response.json();
+        triggersSent.page_load = true;
+        handleBotResponse(data.response || data);
+    }
+
+    // --- TRIGGER: WAIT 15 SECONDS (if no interaction) ---
+    let waitTimer = setTimeout(() => {
+        if (!hasUserInteracted && !triggersSent.wait_15s) {
+            fetch('/Chat/Trigger', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ trigger: 'wait_15s' })
+            }).then(r => r.json()).then(data => {
+                triggersSent.wait_15s = true;
+                handleBotResponse(data.response || data);
+            });
+        }
+    }, 15000); // 15 seconds
+
+    // --- TRIGGER: SCROLL 70% ---
+    window.addEventListener('scroll', () => {
+        if (triggersSent.scroll_70) return;
+
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (window.scrollY / scrollHeight) * 100;
+
+        if (scrolled >= 70 && !triggersSent.scroll_70) {
+            fetch('/Chat/Trigger', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ trigger: 'scroll_70' })
+            }).then(r => r.json()).then(data => {
+                triggersSent.scroll_70 = true;
+                handleBotResponse(data.response || data);
+            });
+        }
+    });
+
+    // --- MARK USER INTERACTION ---
+    function markUserInteraction() {
+        if (!hasUserInteracted) {
+            hasUserInteracted = true;
+            clearTimeout(waitTimer); // Cancel wait trigger
+        }
+    }
+
     // --- 1. HÀM GỬI TIN NHẮN VĂN BẢN ---
     async function sendMessage(text) {
         if (!text.trim()) return;
+        markUserInteraction();
         appendMessage(text, 'user');
         chatInput.value = '';
 
@@ -17,12 +82,8 @@
             });
 
             const data = await response.json();
-            console.log('[chatbot.js] Response từ /Chat/Send:', data);
-            appendMessage('[DEBUG] Backend trả về:\n' + JSON.stringify(data, null, 2), 'bot');
-            // Đảm bảo bóc tách đúng object response từ Python
             handleBotResponse(data.response || data);
         } catch (error) {
-            console.error('Error:', error);
             appendMessage('Xin lỗi, chatbot đang bận.', 'bot');
         }
     }
@@ -31,6 +92,7 @@
     async function sendQuickReply(replyText) {
         // Làm sạch chuỗi trước khi gửi để Python so sánh chính xác 100%
         const cleanReply = replyText.trim();
+        markUserInteraction();
         appendMessage(cleanReply, 'user');
 
         try {
@@ -43,14 +105,11 @@
             if (!response.ok) throw new Error('Lỗi phản hồi Quick Reply');
 
             const data = await response.json();
-            console.log('[chatbot.js] Response từ /Chat/QuickReply:', data);
-            appendMessage('[DEBUG] Backend trả về:\n' + JSON.stringify(data, null, 2), 'bot');
 
             // Lấy dữ liệu phản hồi từ Python (thường nằm trong data.response)
             const botData = data.response || data;
             handleBotResponse(botData);
         } catch (error) {
-            console.error('QuickReply Error:', error);
             appendMessage('Không thể xử lý lựa chọn này.', 'bot');
         }
     }
@@ -78,10 +137,6 @@
                 btn.onclick = () => {
                     const selectedOption = opt.trim(); // Loại bỏ khoảng trắng thừa
                     optionsContainer.remove();
-
-                    // Log ra console để bạn kiểm tra xem chữ gửi đi là gì
-                    console.log("Đang gửi lựa chọn:", selectedOption);
-
                     sendQuickReply(selectedOption);
                 };
                 optionsContainer.appendChild(btn);
@@ -122,4 +177,7 @@
 
     if (chatSendBtn) chatSendBtn.addEventListener('click', () => sendMessage(chatInput.value));
     if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(chatInput.value); });
+
+    // --- TRIGGER PAGE LOAD KHI LOAD XONG ---
+    triggerPageLoad();
 });

@@ -21,20 +21,12 @@ namespace ToanHocHay.WebApp.Controllers
         {
             try
             {
-                // 1. Lấy UserId từ hệ thống (Identity/Session)
                 string userId = GetUserId();
-                _logger.LogInformation($"[ChatController.Send] UserId: {userId}, Message: {request?.Text}");
-                
-                // 2. Gửi sang Service. 
-                // Đảm bảo trong _chatService.SendMessageAsync, dữ liệu được gửi đi với key là "UserId"
                 var result = await _chatService.SendMessageAsync(userId, request.Text);
-                _logger.LogInformation($"[ChatController.Send] Backend Response: {System.Text.Json.JsonSerializer.Serialize(result)}");
-                
                 return Json(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[ChatController.Send] Error: {ex.Message}, StackTrace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -45,16 +37,26 @@ namespace ToanHocHay.WebApp.Controllers
             try
             {
                 string userId = GetUserId();
-                _logger.LogInformation($"[ChatController.QuickReply] UserId: {userId}, Reply: {request?.Reply}");
-                
                 var result = await _chatService.SendQuickReplyAsync(userId, request.Reply);
-                _logger.LogInformation($"[ChatController.QuickReply] Backend Response: {System.Text.Json.JsonSerializer.Serialize(result)}");
-                
                 return Json(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[ChatController.QuickReply] Error: {ex.Message}, StackTrace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Trigger([FromBody] TriggerRequest request)
+        {
+            try
+            {
+                string userId = GetUserId();
+                var result = await _chatService.SendTriggerAsync(userId, request.TriggerType);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
                 throw;
             }
         }
@@ -63,14 +65,10 @@ namespace ToanHocHay.WebApp.Controllers
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                // Lấy ID từ Database người dùng đã đăng nhập
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "guest";
-                _logger.LogDebug($"[ChatController.GetUserId] Authenticated user: {userId}");
                 return userId;
             }
-            // Nếu là khách, dùng ID phiên làm việc tạm thời
             var sessionId = HttpContext.Session.Id ?? "anonymous";
-            _logger.LogDebug($"[ChatController.GetUserId] Anonymous user: {sessionId}");
             return sessionId;
         }
     }
@@ -93,5 +91,11 @@ namespace ToanHocHay.WebApp.Controllers
 
         [JsonPropertyName("reply")]  // Khớp với Python API
         public string Reply { get; set; } = string.Empty;
+    }
+
+    public class TriggerRequest
+    {
+        [JsonPropertyName("trigger")]
+        public string TriggerType { get; set; } = string.Empty;
     }
 }

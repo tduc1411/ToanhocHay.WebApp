@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ToanHocHay.WebApp.Services
 {
@@ -11,29 +12,22 @@ namespace ToanHocHay.WebApp.Services
         public ChatApiService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
-            // Lấy URL và kiểm tra xem nó có tồn tại không
             _chatbotUrl = configuration["AI:ChatbotApiUrl"] ?? "";
-
-            if (string.IsNullOrEmpty(_chatbotUrl))
-            {
-                // In ra console để bạn dễ debug khi chạy ứng dụng
-                Console.WriteLine("CRITICAL: AI:ChatbotApiUrl is missing in appsettings.json");
-            }
         }
 
         public async Task<JsonElement> SendMessageAsync(string userId, string text)
         {
             try
             {
-                var payload = new { user_id = userId, text = text };
+                // Dùng class để kiểm soát JSON property names chính xác
+                var payload = new ChatMessagePayload { UserId = userId, Text = text };
                 var response = await _httpClient.PostAsJsonAsync($"{_chatbotUrl}/message", payload);
 
-                response.EnsureSuccessStatusCode(); // Ném lỗi nếu server trả về 4xx hoặc 5xx
+                response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<JsonElement>();
             }
             catch (Exception ex)
             {
-                // Trả về một đối tượng lỗi giả lập để Frontend xử lý thay vì crash app
                 return JsonDocument.Parse("{\"success\": false, \"response\": {\"message\": \"Không thể kết nối tới server AI.\"}}").RootElement;
             }
         }
@@ -42,22 +36,16 @@ namespace ToanHocHay.WebApp.Services
         {
             try
             {
-                var payload = new { user_id = userId, reply = reply };
+                var payload = new ChatReplyPayload { UserId = userId, Reply = reply };
 
-                // Làm sạch URL: Đảm bảo không bị thừa dấu "/"
                 string baseUrl = _chatbotUrl.TrimEnd('/');
                 string requestUrl = $"{baseUrl}/quick-reply";
 
-                // Log ra cửa sổ Output của Visual Studio để bạn kiểm tra URL thực tế
-                Console.WriteLine($"[DEBUG] Calling AI API: {requestUrl}");
-
                 var response = await _httpClient.PostAsJsonAsync(requestUrl, payload);
 
-                // Nếu Python báo lỗi (500), ta lấy nội dung lỗi đó ra xem
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[ERROR] Python Logic Error: {errorContent}");
                 }
 
                 response.EnsureSuccessStatusCode();
@@ -65,9 +53,62 @@ namespace ToanHocHay.WebApp.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[CRITICAL] Connection Failed: {ex.Message}");
                 return JsonDocument.Parse("{\"response\": {\"message\": \"Lỗi kết nối AI. Kiểm tra Terminal Python ngay!\"}}").RootElement;
             }
         }
+
+        public async Task<JsonElement> SendTriggerAsync(string userId, string trigger)
+        {
+            try
+            {
+                var payload = new ChatTriggerPayload { UserId = userId, Trigger = trigger };
+
+                string baseUrl = _chatbotUrl.TrimEnd('/');
+                string requestUrl = $"{baseUrl}/trigger";
+
+                var response = await _httpClient.PostAsJsonAsync(requestUrl, payload);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                }
+
+                response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return JsonDocument.Parse("{\"response\": {\"message\": \"\"}}").RootElement;
+            }
+        }
+    }
+
+    // Payload classes với JsonPropertyName để kiểm soát JSON output
+    public class ChatMessagePayload
+    {
+        [JsonPropertyName("UserId")]
+        public string UserId { get; set; }
+
+        [JsonPropertyName("text")]
+        public string Text { get; set; }
+    }
+
+    public class ChatReplyPayload
+    {
+        [JsonPropertyName("UserId")]
+        public string UserId { get; set; }
+
+        [JsonPropertyName("reply")]
+        public string Reply { get; set; }
+    }
+
+    public class ChatTriggerPayload
+    {
+        [JsonPropertyName("UserId")]
+        public string UserId { get; set; }
+
+        [JsonPropertyName("trigger")]
+        public string Trigger { get; set; }
     }
 }
