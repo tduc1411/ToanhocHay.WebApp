@@ -12,6 +12,7 @@ builder.Services.AddHttpClient<CourseApiService>();
 builder.Services.AddHttpClient<ExamApiService>();
 builder.Services.AddHttpClient<AuthApiService>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient<ChatApiService>();
 
 // 3. C?u hình Xác th?c b?ng Cookie
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
