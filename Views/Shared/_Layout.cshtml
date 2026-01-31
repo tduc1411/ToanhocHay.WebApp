@@ -487,5 +487,12 @@
             }
         }
     </script>
+    <script>
+        // Lấy UserId từ định danh đã đăng nhập hoặc dùng ID của phiên làm việc
+        const CURRENT_USER_ID = "@(User.Identity?.IsAuthenticated == true ? User.Identity.Name : Context.Session.Id)";
+    </script>
+    <script src="~/js/chatbot.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
