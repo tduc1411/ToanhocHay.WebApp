@@ -115,6 +115,9 @@ namespace ToanHocHay.WebApp.Controllers
             {
                 ViewBag.Error = error ?? "Đăng ký không thành công.";
                 ViewBag.Mode = "register";
+                ViewBag.Role = role; // <--- CỰC KỲ QUAN TRỌNG: Gửi lại vai trò người dùng đã chọn
+                ViewBag.FullName = fullName;
+                ViewBag.Email = email;
                 return View("Login");
             }
 

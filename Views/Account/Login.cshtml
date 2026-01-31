@@ -569,89 +569,90 @@
         }
 
         // === UTILITY FUNCTIONS ===
-
-        // Toggle Password Visibility
         function togglePassword(inputId, icon) {
             const input = document.getElementById(inputId);
+            if (!input) return;
             const isPassword = input.type === 'password';
-
             input.type = isPassword ? 'text' : 'password';
             icon.classList.toggle('fa-eye');
             icon.classList.toggle('fa-eye-slash');
         }
 
-        // Validate Form
         function validateForm(form) {
             const pw = form.password.value;
             const errEl = document.getElementById('pw-error');
             const pwInput = form.password;
-
             if (pw.length < 6) {
-                errEl.classList.remove('hidden');
-                pwInput.classList.remove('border-gray-200');
+                if(errEl) errEl.classList.remove('hidden');
                 pwInput.classList.add('border-red-500');
                 pwInput.focus();
                 return false;
             }
-
-            errEl.classList.add('hidden');
-            pwInput.classList.remove('border-red-500');
-            pwInput.classList.add('border-gray-200');
             return true;
         }
 
         // === RENDER FUNCTIONS ===
-
         const formArea = document.getElementById('form-area');
 
         function renderLogin() {
-            formArea.innerHTML = loginTemplate;
+            if(formArea) formArea.innerHTML = loginTemplate;
         }
 
         function renderRoleSelection() {
-            formArea.innerHTML = roleSelectionTemplate;
+            if(formArea) formArea.innerHTML = roleSelectionTemplate;
         }
 
         function renderRegister(role) {
-            formArea.innerHTML = getRegisterTemplate(role);
+            if(formArea) formArea.innerHTML = getRegisterTemplate(role);
         }
 
-        // === INITIALIZATION ===
+        // === INITIALIZATION (PHẦN QUAN TRỌNG NHẤT) ===
+        function startApp() {
+            // Đảm bảo các biến từ Server luôn có giá trị mặc định, không bao giờ undefined
+            const sError = "@Html.Raw(ViewBag.Error)" || "";
+            const sMode = "@Html.Raw(ViewBag.Mode)" || "login";
+            const sRole = "@Html.Raw(ViewBag.Role)" || "";
 
-        // Initialize based on server mode
-        if (initialMode === 'register') {
-            @if (ViewBag.Mode == "register" && ViewBag.Error != null)
-            {
-                        <text>
-                        // If there's an error, render register form with student as default
-                        renderRegister('student');
-                        </text>
+            console.log("App Start - Mode:", sMode, "Error:", sError, "Role:", sRole);
+
+            if (sMode === 'register') {
+                // Nếu có lỗi và có Role thì hiện thẳng form đăng ký đó
+                if (sError !== "" && sRole !== "") {
+                    renderRegister(sRole);
+                } else {
+                    renderRoleSelection();
+                }
+            } else {
+                renderLogin();
             }
-            else
-            {
-                        <text>
-                        renderRoleSelection();
-                        </text>
-            }
-        } else {
-            renderLogin();
         }
 
-        // Add input animation on focus
-        document.addEventListener('DOMContentLoaded', function() {
-            // This will run after content is loaded
-            setTimeout(() => {
-                const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"]');
-                inputs.forEach(input => {
+        // MutationObserver để giữ hiệu ứng input
+        const observer = new MutationObserver(() => {
+            const inputs = document.querySelectorAll('#form-area input');
+            inputs.forEach(input => {
+                if (!input.dataset.animated) {
                     input.addEventListener('focus', function() {
-                        this.parentElement.classList.add('scale-[1.02]');
+                        this.parentElement.classList.add('scale-[1.02]', 'border-blue-400');
                     });
                     input.addEventListener('blur', function() {
-                        this.parentElement.classList.remove('scale-[1.02]');
+                        this.parentElement.classList.remove('scale-[1.02]', 'border-blue-400');
                     });
-                });
-            }, 100);
+                    input.dataset.animated = "true";
+                }
+            });
         });
+
+        if (formArea) {
+            observer.observe(formArea, { childList: true, subtree: true });
+        }
+
+        // Chạy App
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startApp);
+        } else {
+            startApp();
+        }
     </script>
     <div id="antiforgery-container" style="display:none">@Html.AntiForgeryToken()</div>
 </body>
