@@ -12,7 +12,7 @@
     <div class="absolute -top-24 -right-24 w-96 h-96 bg-white opacity-10 rounded-full blur-[100px] animate-pulse"></div>
 
     <div class="container mx-auto px-4 relative z-10">
-        <div class="max-w-4xl">
+        <div class="max-w-4xl mx-auto text-center">
             <span class="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-black px-4 py-2 rounded-full mb-6 border border-white/30 tracking-widest uppercase">
                 <i class="fa-solid fa-graduation-cap mr-2"></i> @(Model?.CurriculumName ?? "Hệ sinh thái ToanHocHay")
             </span>
@@ -20,13 +20,11 @@
                 Chinh phục Toán học <br />
                 <span class="text-yellow-300">Theo lộ trình riêng</span>
             </h1>
-            <p class="text-lg md:text-xl text-blue-100 max-w-2xl leading-relaxed font-medium">
+            <p class="text-lg md:text-xl text-blue-100 max-w-2xl leading-relaxed font-medium mx-auto">
                 @(Model?.Description ?? "Hệ thống bài giảng AI cá nhân hóa giúp bạn lấp đầy lỗ hổng kiến thức và tối ưu hóa thời gian học tập.")
             </p>
         </div>
     </div>
-
-
 </section>
 
 @* --- 2. THANH ĐIỀU KHIỂN (Search & Sort) --- *@
