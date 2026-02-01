@@ -37,13 +37,6 @@
                        class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold text-sm">
                 <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
             </div>
-
-            <div class="flex gap-4 w-full md:w-auto">
-                <select id="sortOrder" onchange="sortLessons()" class="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white outline-none text-sm font-black text-slate-700 cursor-pointer shadow-sm">
-                    <option value="default">Sắp xếp: Mặc định</option>
-                    <option value="az">Tên bài học: A-Z</option>
-                </select>
-            </div>
         </div>
     </div>
 
@@ -100,26 +93,29 @@
 
         @* --- 4. DANH SÁCH BÀI HỌC --- *@
         <main class="flex-1">
-            <p class="text-red-500">Số lượng chương: @Model.Chapters.Count</p>
             <div class="bg-blue-50 rounded-[2rem] p-6 mb-10 border border-blue-100 flex items-center justify-between shadow-sm">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
                         <i class="fa-solid fa-bullseye text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-[0.1em]">Kết quả tìm kiếm</p>
-                        <p class="text-sm text-slate-700 font-bold">Tìm thấy <span id="found-count" class="text-blue-600">0</span> bài học phù hợp</p>
+                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-[0.1em]">Kết quả học tập</p>
+                        <p class="text-sm text-slate-700 font-bold">
+                            Chương trình có <span class="text-blue-600">@Model.Chapters.Count</span> chương và
+                            <span id="found-count" class="text-blue-600">0</span> bài học
+                        </p>
                     </div>
                 </div>
             </div>
 
             <div id="chapter-container">
-                @if (Model != null && Model.Chapters != null && Model.Chapters.Any())
+                @if (Model?.Chapters != null && Model.Chapters.Any())
                 {
                     @foreach (var chapter in Model.Chapters.OrderBy(c => c.OrderIndex))
                     {
                         var chapterId = $"chapter-{chapter.ChapterId}";
                         <div class="chapter-block bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-gray-100 mb-10 overflow-hidden group">
+                            @* Header của Chương *@
                             <div class="bg-white p-8 cursor-pointer border-b border-gray-50 hover:bg-slate-50 transition" onclick="toggleChapter('@chapterId')">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-6">
@@ -129,7 +125,7 @@
                                         <div>
                                             <h3 class="text-2xl font-black text-slate-900 tracking-tight">@chapter.ChapterName</h3>
                                             <p class="text-sm text-slate-400 font-bold mt-1">
-                                                @(chapter.Topics?.SelectMany(t => t.Lessons).Count() ?? 0) bài học
+                                                @(chapter.Topics?.SelectMany(t => t.Lessons).Count() ?? 0) bài học chi tiết
                                             </p>
                                         </div>
                                     </div>
@@ -137,26 +133,37 @@
                                 </div>
                             </div>
 
+                            @* Danh sách bài học bên trong Chương *@
                             <div id="@chapterId" class="divide-y divide-gray-50 lesson-list">
-                                @if (chapter.Topics != null)
+                                @if (chapter.Topics != null && chapter.Topics.Any())
                                 {
                                     @foreach (var topic in chapter.Topics.OrderBy(t => t.OrderIndex))
                                     {
-                                        @if (topic.Lessons != null)
+                                        @* CHỈ HIỂN THỊ CHỦ ĐỀ NẾU CÓ BÀI HỌC BÊN TRONG *@
+                                        @if (topic.Lessons != null && topic.Lessons.Any())
                                         {
+                                            <div class="bg-slate-50/80 px-8 py-3 text-[10px] font-black text-blue-500 uppercase tracking-widest border-y border-gray-100">
+                                                <i class="fa-solid fa-book-open mr-2"></i> CHỦ ĐỀ: @topic.TopicName
+                                            </div>
+
                                             @foreach (var lesson in topic.Lessons.OrderBy(l => l.OrderIndex))
                                             {
                                                 <div class="lesson-card p-6 flex items-center gap-6 group/lesson hover:bg-blue-50/30 transition-all"
-                                                     data-difficulty="Easy"
-                                                     data-name="@lesson.LessonName">
-                                                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
+                                                     data-name="@lesson.LessonName" data-difficulty="Easy">
+                                                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center group-hover/lesson:bg-blue-600 group-hover/lesson:text-white transition-all shadow-sm">
                                                         <i class="fa-solid fa-play"></i>
                                                     </div>
                                                     <div class="flex-1">
                                                         <h4 class="font-black text-slate-800 text-lg group-hover/lesson:text-blue-600 transition">@lesson.LessonName</h4>
-                                                        <p class="text-[11px] font-black text-slate-400 uppercase">@lesson.DurationMinutes phút học</p>
+                                                        <div class="flex items-center gap-4 mt-1">
+                                                            <p class="text-[11px] font-black text-slate-400 uppercase flex items-center gap-1">
+                                                                <i class="fa-regular fa-clock"></i> @lesson.DurationMinutes PHÚT
+                                                            </p>
+                                                            <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                                                            <p class="text-[11px] font-black text-green-500 uppercase">CƠ BẢN</p>
+                                                        </div>
                                                     </div>
-                                                    <a href="/Lesson/Detail/@lesson.LessonId" class="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase opacity-0 group-hover/lesson:opacity-100 transition-all shadow-lg shadow-slate-200 text-decoration-none">Học ngay</a>
+                                                    <a href="/Course/Learning/@lesson.LessonId" class="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase opacity-0 group-hover/lesson:opacity-100 transition-all shadow-lg hover:scale-105">Học ngay</a>
                                                 </div>
                                             }
                                         }
@@ -170,95 +177,79 @@
                 {
                     <div class="text-center py-20 bg-white rounded-[2.5rem] border border-dashed border-gray-300">
                         <i class="fa-solid fa-box-open text-5xl text-gray-200 mb-4"></i>
-                        <p class="text-slate-400 font-bold">Chưa có bài học nào trong khóa học này.</p>
+                        <p class="text-slate-400 font-bold">Dữ liệu bài giảng đang được cập nhật...</p>
                     </div>
                 }
             </div>
         </main>
     </div>
-
-
 </section>
 
 @section Scripts {
     <script>
         function toggleChapter(chapterId) {
-        const element = document.getElementById(chapterId);
-        const icon = document.getElementById(chapterId + '-icon');
-        if (element.classList.contains('hidden')) {
-        element.classList.remove('hidden');
-        icon.style.transform = 'rotate(180deg)';
-        } else {
-        element.classList.add('hidden');
-        icon.style.transform = 'rotate(0deg)';
-        }
-        }
+            const element = document.getElementById(chapterId);
+            const icon = document.getElementById(chapterId + '-icon');
 
-            function filterLessons() {
-                const searchQuery = document.getElementById('lessonSearch').value.toLowerCase();
-                const selectedDifficulties = Array.from(document.querySelectorAll('.difficulty-checkbox:checked')).map(cb => cb.value);
-                const chapters = document.querySelectorAll('.chapter-block');
-                let totalFound = 0;
-
-                chapters.forEach(chapter => {
-                    const lessons = chapter.querySelectorAll('.lesson-card');
-                    let chapterVisibleLessons = 0;
-
-                    lessons.forEach(lesson => {
-                        const difficulty = lesson.getAttribute('data-difficulty');
-                        const name = lesson.getAttribute('data-name').toLowerCase();
-                        const matchSearch = name.includes(searchQuery);
-                        const matchDifficulty = selectedDifficulties.length === 0 || selectedDifficulties.includes(difficulty);
-
-                        if (matchSearch && matchDifficulty) {
-                            lesson.style.display = 'flex';
-                            chapterVisibleLessons++;
-                            totalFound++;
-                        } else {
-                            lesson.style.display = 'none';
-                        }
-                    });
-
-                    // Nếu chương không có bài học nào thỏa mãn, ẩn luôn cả chương
-                    chapter.style.display = chapterVisibleLessons > 0 ? 'block' : 'none';
-                });
-
-                document.getElementById('found-count').innerText = totalFound;
+            // Sử dụng max-height để tạo hiệu ứng mượt mà (nếu muốn) hoặc đơn giản là d-none
+            if (element.style.display === 'none') {
+                element.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                element.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
             }
+        }
 
-            function sortLessons() {
-                const sortVal = document.getElementById('sortOrder').value;
-                const chapterLists = document.querySelectorAll('.lesson-list');
+                function filterLessons() {
+            const searchQuery = document.getElementById('lessonSearch').value.toLowerCase();
+            const checkedBoxes = document.querySelectorAll('.difficulty-checkbox:checked');
+            const selectedDifficulties = Array.from(checkedBoxes).map(cb => cb.value);
+            const chapters = document.querySelectorAll('.chapter-block');
+            let totalFound = 0;
 
-                chapterLists.forEach(list => {
-                    const cards = Array.from(list.querySelectorAll('.lesson-card'));
+            chapters.forEach(chapter => {
+                const lessons = chapter.querySelectorAll('.lesson-card');
+                let chapterVisibleLessons = 0;
 
-                    if (sortVal === 'az') {
-                        cards.sort((a, b) => {
-                            return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
-                        });
+                lessons.forEach(lesson => {
+                    const name = (lesson.getAttribute('data-name') || "").toLowerCase();
+                    const difficulty = lesson.getAttribute('data-difficulty') || "Easy"; // Lấy difficulty từ attr
+
+                    const matchSearch = name.includes(searchQuery);
+                    const matchDifficulty = selectedDifficulties.length === 0 || selectedDifficulties.includes(difficulty);
+
+                    if (matchSearch && matchDifficulty) {
+                        lesson.style.display = 'flex';
+                        chapterVisibleLessons++;
+                        totalFound++;
                     } else {
-                        // Mặc định (có thể dùng order ban đầu nếu lưu trữ, ở đây tạm thời giữ nguyên)
-                        return;
+                        lesson.style.display = 'none';
                     }
-
-                    cards.forEach(card => list.appendChild(card));
                 });
-            }
 
-            function resetFilters() {
-                const searchInput = document.getElementById('lessonSearch');
-                if (searchInput) searchInput.value = '';
-                document.querySelectorAll('.difficulty-checkbox').forEach((cb, index) => {
-                    cb.checked = (index === 0); // Mặc định chọn cái đầu tiên
-                });
-                filterLessons();
-            }
+                // Hiện/Ẩn chương dựa trên bài học tìm thấy
+                chapter.style.display = chapterVisibleLessons > 0 ? 'block' : 'none';
+            });
 
-            window.onload = function() {
-                filterLessons();
-            };
+            document.getElementById('found-count').innerText = totalFound;
+        }
+
+        
+
+        function resetFilters() {
+            document.getElementById('lessonSearch').value = '';
+            document.querySelectorAll('.difficulty-checkbox').forEach((cb, index) => {
+                cb.checked = (index === 0);
+            });
+            filterLessons();
+        }
+
+        // Tự động chạy khi trang web tải xong
+        document.addEventListener('DOMContentLoaded', function() {
+            filterLessons();
+        });
     </script>
-
+}
 
 }

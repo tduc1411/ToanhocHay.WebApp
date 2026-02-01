@@ -1,165 +1,152 @@
 ﻿@using ToanHocHay.WebApp.Models.DTOs
-@model LessonDto
+@model ToanHocHay.WebApp.Models.DTOs.LessonDto
 
 @{
-    Layout = null;
-    var relatedLessons = ViewBag.RelatedLessons as IEnumerable<LessonDto> ?? new List<LessonDto>();
+    ViewData["Title"] = Model.LessonName;
+    ViewData["HideMainHeader"] = true; // Lệnh này để ẩn Header chính của Website
+    var curriculum = ViewBag.FullCurriculum as CurriculumDto;
 }
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học bài: @Model.LessonName - ToanHocHay</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<div class="min-h-screen bg-[#F8FAFC] flex flex-col">
+    
 
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-        }
+    <div class="container mx-auto px-4 py-6 flex-1">
+        <div class="flex flex-col lg:flex-row gap-6">
 
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
+            @* --- NỘI DUNG BÀI HỌC (Bên trái) --- *@
+            <main class="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden h-fit">
+                @* Tab Menu sạch sẽ *@
+                <div class="flex border-b border-gray-100 bg-gray-50/50">
+                    <button class="px-8 py-4 text-xs font-black border-b-2 border-blue-600 text-blue-600 tracking-widest uppercase">
+                        Lý thuyết
+                    </button>
+                    <button class="px-8 py-4 text-xs font-bold text-gray-400 hover:text-gray-600 tracking-widest uppercase">
+                        Tài liệu
+                    </button>
+                </div>
 
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-
-        .tab-active {
-            border-bottom: 3px solid #3B82F6;
-            color: #1d4ed8;
-            font-weight: 700;
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-</head>
-<body class="bg-gray-50 h-screen flex flex-col overflow-hidden">
-
-    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 shrink-0 z-20 border-b border-gray-200">
-        <div class="flex items-center gap-4">
-            <a href="/Course/Index" class="flex items-center gap-2 hover:opacity-80 transition pr-4 border-r border-gray-200">
-                <i class="fa-solid fa-shapes text-2xl text-yellow-400"></i>
-                <span class="text-xl font-bold text-blue-600 hidden md:block">ToanHocHay</span>
-            </a>
-            <h1 class="text-base font-bold text-gray-700 truncate max-w-[400px]">@Model.LessonName</h1>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="hidden md:flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-bold">
-                <i class="fa-solid fa-trophy text-yellow-500"></i> Đang học
-            </div>
-            <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Felix" class="w-9 h-9 rounded-full border bg-blue-50">
-        </div>
-    </header>
-
-    <main class="flex-1 flex overflow-hidden">
-        <!-- Khu vực nội dung bài giảng -->
-        <div class="flex-1 flex flex-col overflow-y-auto custom-scroll bg-white relative">
-            <div class="sticky top-0 bg-white border-b px-6 pt-4 z-10 shadow-sm flex gap-8">
-                <button onclick="switchTab('theory')" id="tab-btn-theory" class="tab-btn tab-active pb-3 text-sm">
-                    <i class="fa-solid fa-book-open mr-2"></i>Lý thuyết
-                </button>
-                <button onclick="switchTab('notes')" id="tab-btn-notes" class="tab-btn pb-3 text-sm text-gray-400">
-                    <i class="fa-solid fa-note-sticky mr-2"></i>Ghi chú
-                </button>
-            </div>
-
-            <div class="p-8 max-w-4xl mx-auto w-full pb-32">
-                <div id="content-theory" class="tab-content animate-fade-in">
-                    @if (Model.Contents != null)
+                @* Render nội dung từ Database *@
+                <div class="p-6 md:p-12 space-y-10">
+                    @if (Model.Contents != null && Model.Contents.Any())
                     {
                         @foreach (var block in Model.Contents.OrderBy(c => c.OrderIndex))
                         {
-                            @if (block.BlockType == LessonBlockType.Video)
+                            switch (block.BlockType)
                             {
-                                <div class="aspect-video mb-10 rounded-3xl overflow-hidden shadow-2xl border-4 border-gray-50">
-                                    <iframe class="w-full h-full" src="@block.ContentUrl" allowfullscreen></iframe>
-                                </div>
-                            }
-                            else if (block.BlockType == LessonBlockType.Heading)
-                            {
-                                <h2 class="text-2xl font-black text-gray-800 mb-6 mt-10">@block.ContentText</h2>
-                            }
-                            else if (block.BlockType == LessonBlockType.Text)
-                            {
-                                <div class="text-gray-700 leading-relaxed mb-6 text-lg">@Html.Raw(block.ContentText)</div>
-                            }
-                            else if (block.BlockType == LessonBlockType.Formula)
-                            {
-                                <div class="bg-slate-50 p-6 rounded-2xl border border-blue-100 text-center my-8 shadow-inner">
-                                    <div class="text-blue-700 text-xl font-mono">\[ @block.ContentText \]</div>
-                                </div>
+                                case LessonBlockType.Heading:
+                                    <h2 class="text-2xl font-black text-gray-800">@block.ContentText</h2>
+                                    break;
+                                case LessonBlockType.Definition:
+                                    <div class="bg-blue-50/50 border-l-4 border-blue-400 rounded-r-lg p-6 my-4">
+                                        <div class="text-blue-700 font-bold mb-2 flex items-center gap-2">
+                                            <i class="fa-solid fa-lightbulb text-sm"></i> Định nghĩa:
+                                        </div>
+                                        <div class="text-gray-700 leading-relaxed italic">@block.ContentText</div>
+                                    </div>
+                                    break;
+                                case LessonBlockType.Formula:
+                                    <div class="bg-slate-900 text-white p-8 rounded-xl text-center shadow-lg my-6">
+                                        <div class="text-2xl text-yellow-300">\[ @block.ContentText \]</div>
+                                    </div>
+                                    break;
+                                case LessonBlockType.Video:
+                                    <div class="aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                                        <iframe class="w-full h-full" src="@block.ContentUrl" frameborder="0" allowfullscreen></iframe>
+                                    </div>
+                                    break;
+                                case LessonBlockType.Text:
+                                    <div class="text-gray-700 leading-relaxed text-lg font-medium">@Html.Raw(block.ContentText)</div>
+                                    break;
                             }
                         }
                     }
                 </div>
-                <div id="content-notes" class="tab-content hidden p-10 text-center text-gray-400 italic">
-                    Chưa có ghi chú nào cho bài học này.
+
+                @* Nút chuyển bài ở dưới *@
+                <div class="p-6 border-t border-gray-100 flex items-center justify-between bg-white">
+                    <button class="flex items-center gap-2 text-gray-400 font-bold hover:text-gray-800 transition">
+                        <i class="fa-solid fa-chevron-left text-xs"></i> Bài trước
+                    </button>
+                    <button class="bg-orange-500 text-white px-8 py-3 rounded-full font-black shadow-lg shadow-orange-100 hover:bg-orange-600 transition flex items-center gap-2">
+                        Làm bài tập vận dụng <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
                 </div>
-            </div>
+            </main>
 
-            <!-- Nút điều hướng cố định bên dưới -->
-            <div class="p-4 border-t bg-white sticky bottom-0 flex justify-between items-center shadow-[0_-4px_20px_rgba(0,0,0,0.05)] px-10">
-                <button class="text-gray-400 font-bold px-4 py-2 opacity-50"><i class="fa-solid fa-chevron-left mr-2"></i> Bài trước</button>
-                <a href="/Exercise/DoExercise?topicId=@Model.TopicId"
-                   class="bg-orange-500 hover:bg-orange-600 text-white font-black px-10 py-3.5 rounded-2xl shadow-lg shadow-orange-100 flex items-center gap-3 transition-all hover:-translate-y-1">
-                    LÀM BÀI TẬP VẬN DỤNG <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
-        </div>
+            @* --- SYLLABUS (Bên phải) --- *@
+            <aside class="w-full lg:w-[380px]">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-[90px]">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
+                        <h3 class="font-black text-gray-800 uppercase text-[10px] tracking-widest">Nội dung khóa học</h3>
+                        <span class="bg-green-50 text-green-600 text-[10px] font-black px-2 py-1 rounded border border-green-100">Đã xong 10%</span>
+                    </div>
 
-        <!-- Sidebar Danh sách bài học -->
-        <aside class="w-80 md:w-96 bg-gray-50 border-l flex flex-col shrink-0">
-            <div class="p-5 border-b bg-white font-black text-gray-800 shadow-sm flex items-center gap-2">
-                <i class="fa-solid fa-list-check text-blue-500"></i> Danh sách bài học
-            </div>
-            <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3">
-                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                    <div class="divide-y divide-gray-100">
-                        @foreach (var lesson in relatedLessons)
+                    <div class="p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-220px)] custom-scrollbar">
+                        @if (curriculum?.Chapters != null)
                         {
-                            <a href="/Lesson/Detail/@lesson.LessonId"
-                               class="flex p-4 gap-4 transition-all @(lesson.LessonId == Model.LessonId ? "bg-blue-50 border-l-4 border-blue-600" : "hover:bg-gray-50")">
-                                <i class="fa-solid @(lesson.LessonId == Model.LessonId ? "fa-circle-play text-blue-600 animate-pulse" : "fa-circle-check text-gray-200") mt-1"></i>
-                                <div>
-                                    <h4 class="text-sm font-bold @(lesson.LessonId == Model.LessonId ? "text-blue-700" : "text-gray-700")">@lesson.LessonName</h4>
-                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">@lesson.DurationMinutes phút học</span>
+                            @foreach (var chapter in curriculum.Chapters.OrderBy(c => c.OrderIndex))
+                            {
+                                var chapterId = "chapter-" + chapter.ChapterId;
+                                bool isCurrentChapter = chapter.Topics?.Any(t => t.Lessons?.Any(l => l.LessonId == Model.LessonId) ?? false) ?? false;
+
+                                <div class="border @(isCurrentChapter ? "border-blue-100 bg-blue-50/5" : "border-gray-50") rounded-lg overflow-hidden transition-all">
+                                    <button onclick="toggleChapter('@chapterId')"
+                                            class="w-full px-4 py-3 flex items-center justify-between @(isCurrentChapter ? "bg-blue-50/20" : "bg-white") hover:bg-blue-50/10 transition-colors">
+                                        <span class="text-[11px] font-black @(isCurrentChapter ? "text-blue-600" : "text-gray-500") uppercase text-left">@chapter.ChapterName</span>
+                                        <i class="fa-solid @(isCurrentChapter ? "fa-chevron-up" : "fa-chevron-down") text-[10px] transition-transform duration-300" id="@(chapterId)-icon"></i>
+                                    </button>
+
+                                    <div id="@chapterId" class="@(isCurrentChapter ? "" : "hidden") bg-white divide-y divide-gray-50" style="@(isCurrentChapter ? "" : "display: none;")">
+                                        @foreach (var topic in chapter.Topics ?? new List<TopicDto>())
+                                        {
+                                            @foreach (var lesson in topic.Lessons ?? new List<LessonDto>())
+                                            {
+                                                bool isSelected = lesson.LessonId == Model.LessonId;
+                                                <a href="/Course/Learning/@lesson.LessonId"
+                                                   class="flex items-center gap-3 p-4 hover:bg-blue-50/30 transition-all @(isSelected ? "bg-blue-50/20" : "")">
+                                                    <i class="fa-solid @(isSelected ? "fa-circle-play text-blue-600" : "fa-circle-check text-gray-200") text-base"></i>
+                                                    <div class="flex-1">
+                                                        <p class="text-[13px] font-bold @(isSelected ? "text-blue-700" : "text-gray-600") leading-tight">@lesson.LessonName</p>
+                                                        <p class="text-[10px] text-gray-400 mt-0.5">Lý thuyết</p>
+                                                    </div>
+                                                </a>
+                                            }
+                                        }
+                                    </div>
                                 </div>
-                            </a>
+                            }
                         }
                     </div>
                 </div>
-            </div>
-        </aside>
-    </main>
+            </aside>
+        </div>
+    </div>
+</div>
 
+@section Scripts {
     <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active', 'text-blue-600'));
-            document.getElementById(`tab-btn-${tabId}`).classList.add('tab-active');
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+        function toggleChapter(chapterId) {
+            const content = document.getElementById(chapterId);
+            const icon = document.getElementById(chapterId + '-icon');
+            if (content) {
+                const isHidden = content.style.display === 'none' || content.classList.contains('hidden');
+                if (isHidden) {
+                    content.style.display = 'block';
+                    content.classList.remove('hidden');
+                    if (icon) {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    }
+                } else {
+                    content.style.display = 'none';
+                    content.classList.add('hidden');
+                    if (icon) {
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    }
+                }
+            }
         }
     </script>
-</body>
-</html>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+}

@@ -11,9 +11,20 @@ namespace ToanHocHay.WebApp.Controllers
     {
         private readonly AuthApiService _authApiService;
 
-        public StudentController(AuthApiService authApiService)
+        private readonly CourseApiService _courseApiService;
+
+        public StudentController(AuthApiService authApiService, CourseApiService courseApiService)
         {
             _authApiService = authApiService;
+            _courseApiService = courseApiService;
+        }
+        public async Task<IActionResult> Dashboard()
+        {
+            // Gọi Service để lấy dữ liệu thống kê (Điểm TB, Chart...)
+            var stats = await _courseApiService.GetStudentDashboardStatsAsync();
+
+            // Nếu stats null (ví dụ học sinh mới chưa làm bài), truyền một object rỗng để View không lỗi
+            return View(stats ?? new StudentDashboardDto());
         }
 
         // URL: /Student/Profile

@@ -15,19 +15,17 @@ namespace ToanHocHay.WebApp.Controllers
 
         // Trang hiển thị lộ trình học tập chi tiết (Chapters -> Topics -> Lessons)
         // URL: /Course/Index
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id = 1)
         {
-            // Lấy chi tiết lộ trình ID = 1 (Ví dụ: Toán lớp 6)
-            // Lưu ý: Dữ liệu này cần được API trả về dạng Nested JSON (kèm Chapters)
-            var curriculum = await _courseApi.GetCurriculumDetailAsync(1);
+            // Gọi Service với id linh hoạt
+            var curriculum = await _courseApi.GetCurriculumDetailAsync(id);
 
             if (curriculum == null)
             {
-                // Nếu không tìm thấy, gửi một object rỗng để View không bị lỗi NullReference
+                // Tránh lỗi null reference ở View bằng cách khởi tạo list trống
                 return View(new CurriculumDto { Chapters = new List<ChapterDto>() });
             }
 
-            // Gửi duy nhất 1 CurriculumDto khớp với khai báo @model trong Canvas
             return View(curriculum);
         }
 
@@ -35,13 +33,16 @@ namespace ToanHocHay.WebApp.Controllers
         // URL: /Course/Learning/id
         public async Task<IActionResult> Learning(int id)
         {
+            // 1. Lấy chi tiết bài học hiện tại (để hiện nội dung chính)
             var lesson = await _courseApi.GetLessonDetailAsync(id);
             if (lesson == null) return NotFound();
 
-            // Lấy danh sách bài học liên quan trong cùng chủ đề để hiện ở Sidebar
-            ViewBag.RelatedLessons = await _courseApi.GetLessonsByTopicAsync(lesson.TopicId);
+            // 2. Lấy toàn bộ cấu trúc chương trình (để hiện danh sách chương/bài bên phải)
+            // Giả sử bài học thuộc CurriculumId = 1, bạn có thể lấy động từ lesson nếu có field này
+            var curriculum = await _courseApi.GetCurriculumDetailAsync(1);
+            ViewBag.FullCurriculum = curriculum;
 
-            return View(lesson);
+            return View("Lesson", lesson);
         }
     }
 }

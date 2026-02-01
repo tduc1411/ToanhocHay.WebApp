@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using ToanHocHay.WebApp.Common.Constants;
 using ToanHocHay.WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,11 +9,16 @@ builder.Services.AddControllersWithViews();
 
 // 2. ??NG KÝ CÁC D?CH V? G?I API (QUAN TR?NG)
 // Thêm dòng HttpClient cho CourseApiService ?? WebApp có th? l?y d? li?u bài gi?ng
-builder.Services.AddHttpClient<CourseApiService>();
-builder.Services.AddHttpClient<ExamApiService>();
-builder.Services.AddHttpClient<AuthApiService>();
+var baseUri = ApiConstant.apiBaseUrl.EndsWith("/") ? ApiConstant.apiBaseUrl : ApiConstant.apiBaseUrl + "/";
+var finalApiUrl = new Uri(baseUri + "api/");
+
+// Đăng ký HttpClient kèm BaseAddress cho TẤT CẢ các Service
+builder.Services.AddHttpClient<CourseApiService>(client => client.BaseAddress = finalApiUrl);
+builder.Services.AddHttpClient<ExamApiService>(client => client.BaseAddress = finalApiUrl);
+builder.Services.AddHttpClient<AuthApiService>(client => client.BaseAddress = finalApiUrl);
+builder.Services.AddHttpClient<ChatApiService>(client => client.BaseAddress = finalApiUrl);
+
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddHttpClient<ChatApiService>();
 
 
 // 3. C?u hình Xác th?c b?ng Cookie
@@ -42,14 +48,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSession();
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // ??m b?o các file css/js/img trong wwwroot ho?t ??ng
+app.UseStaticFiles();
 
-app.UseRouting();
+app.UseRouting(); // 1. Định tuyến trước
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseSession(); // 2. Rồi mới đến Session để lưu Token
+app.UseAuthentication(); // 3. Xác thực người dùng
+app.UseAuthorization(); // 4. Kiểm tra quyền
 
 // Map các file static t? bundle m?i c?a .NET 9 (n?u có)
 app.MapStaticAssets();

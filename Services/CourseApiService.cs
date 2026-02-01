@@ -1,14 +1,10 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using ToanHocHay.WebApp.Common.Constants;
 using ToanHocHay.WebApp.Models.DTOs;
 
 namespace ToanHocHay.WebApp.Services
 {
-    /// <summary>
-    /// Dịch vụ kết nối và lấy dữ liệu khóa học, bài giảng từ Backend API
-    /// </summary>
     public class CourseApiService
     {
         private readonly HttpClient _httpClient;
@@ -19,19 +15,12 @@ namespace ToanHocHay.WebApp.Services
         {
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
-
-            // Cấu hình để không phân biệt chữ hoa chữ thường khi giải mã JSON từ API
-            _jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
-        /// <summary>
-        /// Tự động lấy JWT Token từ Session (nếu có) và gắn vào Header Authorization
-        /// </summary>
         private void AddAuthHeader()
         {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
             var token = _httpContextAccessor.HttpContext?.Session.GetString("Token");
             if (!string.IsNullOrEmpty(token))
             {
@@ -39,136 +28,110 @@ namespace ToanHocHay.WebApp.Services
             }
         }
 
-        /// <summary>
-        /// Lấy toàn bộ danh sách bài giảng (Dùng cho trang Index Lesson)
-        /// URL: GET /api/Lesson
-        /// </summary>
+        // --- CÁC HÀM GỌI API (Dùng đường dẫn ngắn, bỏ ApiConstant) ---
+
         public async Task<IEnumerable<LessonDto>> GetAllLessonsAsync()
         {
             try
             {
                 AddAuthHeader();
-                var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/Lesson");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var resString = await response.Content.ReadAsStringAsync();
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<LessonDto>>>(resString, _jsonOptions);
-                    return apiResponse?.Data ?? new List<LessonDto>();
-                }
-                return new List<LessonDto>();
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<IEnumerable<LessonDto>>>("Lesson", _jsonOptions);
+                return response?.Data ?? new List<LessonDto>();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"--- Lỗi GetAllLessons: {ex.Message} ---");
+                Console.WriteLine($"Lỗi GetAllLessons: {ex.Message}");
                 return new List<LessonDto>();
             }
         }
 
-        /// <summary>
-        /// Lấy chi tiết nội dung một bài học bao gồm Video, văn bản, công thức...
-        /// URL: GET /api/Lesson/{id}
-        /// </summary>
         public async Task<LessonDto?> GetLessonDetailAsync(int lessonId)
         {
             try
             {
                 AddAuthHeader();
-                var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/Lesson/{lessonId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var resString = await response.Content.ReadAsStringAsync();
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<LessonDto>>(resString, _jsonOptions);
-                    return apiResponse?.Data;
-                }
-                return null;
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<LessonDto>>($"Lesson/{lessonId}", _jsonOptions);
+                return response?.Data;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"--- Lỗi GetLessonDetail: {ex.Message} ---");
+                Console.WriteLine($"Lỗi GetLessonDetail: {ex.Message}");
                 return null;
             }
         }
 
-        /// <summary>
-        /// Lấy danh sách bài giảng thuộc cùng một chủ đề (Dùng cho Sidebar)
-        /// URL: GET /api/Lesson/by-topic/{topicId}
-        /// </summary>
         public async Task<IEnumerable<LessonDto>> GetLessonsByTopicAsync(int topicId)
         {
             try
             {
                 AddAuthHeader();
-                // Sử dụng route "by-topic" để khớp với cấu hình Backend
-                var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/Lesson/by-topic/{topicId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var resString = await response.Content.ReadAsStringAsync();
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<IEnumerable<LessonDto>>>(resString, _jsonOptions);
-                    return apiResponse?.Data ?? new List<LessonDto>();
-                }
-                return new List<LessonDto>();
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<IEnumerable<LessonDto>>>($"Lesson/by-topic/{topicId}", _jsonOptions);
+                return response?.Data ?? new List<LessonDto>();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"--- Lỗi GetLessonsByTopic: {ex.Message} ---");
+                Console.WriteLine($"Lỗi GetLessonsByTopic: {ex.Message}");
                 return new List<LessonDto>();
             }
         }
-
-        /// <summary>
-        /// Lấy toàn bộ cấu trúc phân cấp của chương trình học (Chương -> Chủ đề -> Bài học)
-        /// URL: GET /api/Curriculum/{id}
-        /// </summary>
-        public async Task<CurriculumDto?> GetCurriculumDetailAsync(int curriculumId)
+        public async Task<StudentDashboardDto?> GetStudentDashboardStatsAsync()
         {
             try
             {
                 AddAuthHeader();
-                var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/Curriculum/{curriculumId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var resString = await response.Content.ReadAsStringAsync();
-                    // THÊM DÒNG NÀY:
-                    Console.WriteLine("DỮ LIỆU THÔ TỪ API: " + resString);
-
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<CurriculumDto>>(resString, _jsonOptions);
-                    return apiResponse?.Data;
-                }
-                return null;
+                // Gọi đến endpoint dashboard-stats ở phía API
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<StudentDashboardDto>>("Student/dashboard-stats", _jsonOptions);
+                return response?.Data;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"--- Lỗi GetCurriculumDetail: {ex.Message} ---");
+                Console.WriteLine($"Lỗi GetStudentDashboardStats: {ex.Message}");
+                return null;
+            }
+        }
+        public async Task<ApiResponse<bool>> UpdateProfileAsync(UpdateProfileDto dto)
+        {
+            try
+            {
+                AddAuthHeader();
+                var response = await _httpClient.PostAsJsonAsync("Student/update-profile", dto);
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>(_jsonOptions);
+
+                // Sửa dòng này:
+                return result ?? new ApiResponse<bool> { Success = false, Message = "Không nhận được phản hồi" };
+            }
+            catch (Exception ex)
+            {
+                // Và sửa dòng này:
+                return new ApiResponse<bool> { Success = false, Message = ex.Message };
+            }
+        }
+        public async Task<CurriculumDto?> GetCurriculumDetailAsync(int id)
+        {
+            try
+            {
+                AddAuthHeader();
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<CurriculumDto>>($"Curriculum/{id}", _jsonOptions);
+                return (response != null && response.Success) ? response.Data : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi GetCurriculum: {ex.Message}");
                 return null;
             }
         }
 
-        /// <summary>
-        /// Lấy danh sách bài tập vận dụng cho một chủ đề cụ thể
-        /// URL: GET /api/Exercise/by-topic/{topicId}
-        /// </summary>
         public async Task<List<ExerciseDto>> GetExercisesByTopicAsync(int topicId)
         {
             try
             {
                 AddAuthHeader();
-                var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/Exercise/by-topic/{topicId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var resString = await response.Content.ReadAsStringAsync();
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<ExerciseDto>>>(resString, _jsonOptions);
-                    return apiResponse?.Data ?? new List<ExerciseDto>();
-                }
-                return new List<ExerciseDto>();
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<ExerciseDto>>>($"Exercise/by-topic/{topicId}", _jsonOptions);
+                return response?.Data ?? new List<ExerciseDto>();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"--- Lỗi GetExercisesByTopic: {ex.Message} ---");
+                Console.WriteLine($"Lỗi GetExercisesByTopic: {ex.Message}");
                 return new List<ExerciseDto>();
             }
         }
