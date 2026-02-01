@@ -30,12 +30,23 @@ namespace ToanHocHay.WebApp.Controllers
         // URL: /Student/Profile
         public async Task<IActionResult> Profile()
         {
-            // Lấy UserId từ Token đã lưu khi đăng nhập
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr)) return RedirectToAction("Login", "Account");
+            // 1. Lấy ID người dùng từ Claims
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return RedirectToAction("Login", "Account");
 
-            var userProfile = await _authApiService.GetProfileAsync(int.Parse(userIdStr));
-            return View(userProfile);
+            int userId = int.Parse(userIdClaim.Value);
+
+            // 2. Gọi API để lấy thông tin (Quan trọng: phải có dữ liệu trả về)
+            var userProfile = await _authApiService.GetProfileAsync(userId);
+
+            // 3. Kiểm tra nếu Service trả về null thì phải khởi tạo một Object rỗng 
+            // để tránh lỗi "Object reference not set..." tại View
+            if (userProfile == null)
+            {
+                userProfile = new UserDto { FullName = "Học sinh", Email = "" };
+            }
+
+            return View(userProfile); // Truyền userProfile sang View
         }
 
         [HttpPost]

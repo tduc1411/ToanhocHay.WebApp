@@ -9,5 +9,6 @@
         public UserType UserType { get; set; }
         public string? SchoolName { get; set; }
         public int? GradeLevel { get; set; }
+        public string? AvatarSeed { get; set; }
     }
 }

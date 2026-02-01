@@ -174,9 +174,12 @@
                             {
                                 <div class="relative group">
                                     <button class="flex items-center gap-3 px-4 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border border-transparent hover:border-blue-200">
-                                        <img src="~/images/avatar/default-avatar.jpg"
+                                        @* QUAN TRỌNG: Phải có id="global-header-avatar" ở đây *@
+                                        <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=@User.Identity.Name"
                                              alt="Avatar"
+                                             id="global-header-avatar"
                                              class="w-10 h-10 rounded-full object-cover border-2 border-blue-200 shadow-sm" />
+
                                         <span class="font-bold text-sm text-gray-700">
                                             @User.Identity.Name
                                         </span>
@@ -198,8 +201,10 @@
                             }
                             else
                             {
-                                <a href="/Account/Register" class="px-6 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all duration-300">Đăng Ký</a>
-                                <a href="/Account/Login" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">Đăng Nhập</a>
+                                <div class="flex items-center gap-3">
+                                    <a href="/Account/Register" class="px-6 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all duration-300">Đăng Ký</a>
+                                    <a href="/Account/Login" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">Đăng Nhập</a>
+                                </div>
                             }
                         </div>
                     </div>
@@ -486,6 +491,25 @@
         const CURRENT_USER_ID = "@(User.Identity?.IsAuthenticated == true ? User.Identity.Name : Context.Session.Id)";
     </script>
     <script src="~/js/chatbot.js" asp-append-version="true"></script>
+    <script>
+        // 1. Hàm cập nhật ảnh Header toàn cục
+        function updateGlobalAvatar(newStyle, seed) {
+            const headerImg = document.getElementById('global-header-avatar');
+            if (headerImg) {
+                headerImg.src = `https://api.dicebear.com/7.x/${newStyle}/svg?seed=${seed}`;
+            }
+        }
+
+        // 2. Tự động load style đã lưu khi chuyển trang
+                document.addEventListener('DOMContentLoaded', () => {
+            const savedStyle = localStorage.getItem('user_avatar_style') || 'fun-emoji';
+            const userName = "@User.Identity?.Name";
+            if (userName && userName !== "") {
+                // Hàm này sẽ đổi ảnh trên Header ngay khi load trang
+                updateGlobalAvatar(savedStyle, userName);
+            }
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

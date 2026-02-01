@@ -39,7 +39,11 @@
             </a>
             <div class="flex items-center gap-4">
                 <span class="text-sm font-bold text-gray-600 hidden md:inline">Học sinh: @User.Identity?.Name</span>
-                <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=@User.Identity?.Name" class="w-9 h-9 rounded-full border bg-blue-50 shadow-sm">
+                <button type="button" onclick="openAvatarModal()" class="hover:scale-110 transition">
+                    <img id="header-avatar"
+                         src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=@User.Identity?.Name"
+                         class="w-9 h-9 rounded-full border bg-blue-50 shadow-sm">
+                </button>
             </div>
         </div>
     </header>
@@ -182,37 +186,31 @@
 
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        @if (Model.ChartData != null && Model.ChartData.Any())
-        {
-                <text>
-                const ctx = document.getElementById('scoreChart').getContext('2d');
-                const labels = @Html.Raw(Json.Serialize(Model.ChartData.Select(x => x.ChapterName)));
-                const dataValues = @Html.Raw(Json.Serialize(Model.ChartData.Select(x => x.AvgScore)));
+        async function openAvatarModal() {
+            const { value: style } = await Swal.fire({
+                title: 'Chọn phong cách Dashboard',
+                input: 'select',
+                inputOptions: {
+                    'fun-emoji': 'Vui nhộn (Emoji)',
+                    'adventurer': 'Nhà thám hiểm',
+                    'avataaars': 'Hoạt hình',
+                    'bottts': 'Người máy',
+                    'pixel-art': 'Cổ điển'
+                },
+                inputPlaceholder: 'Thay đổi kiểu Avatar...',
+                showCancelButton: true,
+                confirmButtonColor: '#3B82F6'
+            });
 
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Điểm trung bình',
-                            data: dataValues,
-                            backgroundColor: '#8B5CF6',
-                            borderRadius: 8,
-                            barThickness: 40
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, max: 10, ticks: { stepSize: 2 } },
-                            x: { grid: { display: false } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-                </text>
+            if (style) {
+                // Đổi ảnh trên Header Dashboard ngay lập tức
+                const newUrl = `https://api.dicebear.com/7.x/${style}/svg?seed=@User.Identity?.Name`;
+                document.getElementById('header-avatar').src = newUrl;
+
+                Swal.fire('Đã đổi!', 'Giao diện Dashboard của bạn trông mới mẻ hơn rồi đấy.', 'success');
+            }
         }
     </script>
 </body>

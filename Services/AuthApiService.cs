@@ -51,7 +51,8 @@ namespace ToanHocHay.WebApp.Services
         {
             try
             {
-                var apiResponse = await _httpClient.GetFromJsonAsync<ApiResponse<UserDto>>($"{ApiConstant.apiBaseUrl}/api/auth/profile/{userId}");
+                // Sửa /api/auth/profile/ thành /api/user/
+                var apiResponse = await _httpClient.GetFromJsonAsync<ApiResponse<UserDto>>($"{ApiConstant.apiBaseUrl}/api/user/{userId}");
                 return apiResponse?.Data;
             }
             catch { return null; }
