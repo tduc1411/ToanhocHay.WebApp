@@ -149,7 +149,7 @@
                                             @foreach (var lesson in topic.Lessons.OrderBy(l => l.OrderIndex))
                                             {
                                                 <div class="lesson-card p-6 flex items-center gap-6 group/lesson hover:bg-blue-50/30 transition-all"
-                                                     data-name="@lesson.LessonName">
+                                                     data-name="@lesson.LessonName" data-difficulty="Easy">
                                                     <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center group-hover/lesson:bg-blue-600 group-hover/lesson:text-white transition-all shadow-sm">
                                                         <i class="fa-solid fa-play"></i>
                                                     </div>
@@ -201,7 +201,7 @@
             }
         }
 
-        function filterLessons() {
+                function filterLessons() {
             const searchQuery = document.getElementById('lessonSearch').value.toLowerCase();
             const checkedBoxes = document.querySelectorAll('.difficulty-checkbox:checked');
             const selectedDifficulties = Array.from(checkedBoxes).map(cb => cb.value);
@@ -214,10 +214,10 @@
 
                 lessons.forEach(lesson => {
                     const name = (lesson.getAttribute('data-name') || "").toLowerCase();
-                    const matchSearch = name.includes(searchQuery);
+                    const difficulty = lesson.getAttribute('data-difficulty') || "Easy"; // Lấy difficulty từ attr
 
-                    // Vì hiện tại DB chưa có trường Difficulty nên mặc định là Easy
-                    const matchDifficulty = selectedDifficulties.length === 0 || selectedDifficulties.includes("Easy");
+                    const matchSearch = name.includes(searchQuery);
+                    const matchDifficulty = selectedDifficulties.length === 0 || selectedDifficulties.includes(difficulty);
 
                     if (matchSearch && matchDifficulty) {
                         lesson.style.display = 'flex';
@@ -228,7 +228,7 @@
                     }
                 });
 
-                // Ẩn chương nếu không có bài học nào khớp
+                // Hiện/Ẩn chương dựa trên bài học tìm thấy
                 chapter.style.display = chapterVisibleLessons > 0 ? 'block' : 'none';
             });
 
