@@ -8,7 +8,12 @@ builder.Services.AddControllersWithViews();
 
 // 2. ??NG KÝ CÁC D?CH V? G?I API (QUAN TR?NG)
 // Thêm dòng HttpClient cho CourseApiService ?? WebApp có th? l?y d? li?u bài gi?ng
-builder.Services.AddHttpClient<CourseApiService>();
+builder.Services.AddHttpClient<CourseApiService>(client =>
+{
+    // Lấy từ config để sau này đổi sang tên miền cho dễ
+    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
+    client.BaseAddress = new Uri(baseUrl);
+});
 builder.Services.AddHttpClient<ExamApiService>();
 builder.Services.AddHttpClient<AuthApiService>();
 builder.Services.AddHttpContextAccessor();
