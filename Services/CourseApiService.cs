@@ -74,7 +74,38 @@ namespace ToanHocHay.WebApp.Services
                 return new List<LessonDto>();
             }
         }
+        public async Task<StudentDashboardDto?> GetStudentDashboardStatsAsync()
+        {
+            try
+            {
+                AddAuthHeader();
+                // Gọi đến endpoint dashboard-stats ở phía API
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<StudentDashboardDto>>("Student/dashboard-stats", _jsonOptions);
+                return response?.Data;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi GetStudentDashboardStats: {ex.Message}");
+                return null;
+            }
+        }
+        public async Task<ApiResponse<bool>> UpdateProfileAsync(UpdateProfileDto dto)
+        {
+            try
+            {
+                AddAuthHeader();
+                var response = await _httpClient.PostAsJsonAsync("Student/update-profile", dto);
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>(_jsonOptions);
 
+                // Sửa dòng này:
+                return result ?? new ApiResponse<bool> { Success = false, Message = "Không nhận được phản hồi" };
+            }
+            catch (Exception ex)
+            {
+                // Và sửa dòng này:
+                return new ApiResponse<bool> { Success = false, Message = ex.Message };
+            }
+        }
         public async Task<CurriculumDto?> GetCurriculumDetailAsync(int id)
         {
             try

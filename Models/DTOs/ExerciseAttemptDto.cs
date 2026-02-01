@@ -21,6 +21,8 @@ namespace ToanHocHay.WebApp.Models.DTOs
 
         // Danh sách câu hỏi trong lượt làm bài
         public List<QuestionInAttemptDto> Questions { get; set; } = new();
+        public double Score { get; set; }
+
     }
 
     public class QuestionInAttemptDto
