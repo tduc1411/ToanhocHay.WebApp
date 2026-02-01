@@ -162,5 +162,28 @@ namespace ToanHocHay.WebApp.Services
             }
             catch { return null; }
         }
+
+        // 7. Gọi AI Gợi ý
+        public async Task<AIHintDto?> GetAIHintAsync(AIHintRequestDto dto)
+        {
+            try
+            {
+                AddAuthHeader();
+                var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/AIHint", dto);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var resString = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<AIHintDto>>(resString, _jsonOptions);
+                    return apiResponse?.Data;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--- Lỗi GetAIHint: {ex.Message} ---");
+                return null;
+            }
+        }
     }
 }

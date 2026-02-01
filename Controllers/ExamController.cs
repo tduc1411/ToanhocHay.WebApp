@@ -104,5 +104,19 @@ namespace ToanHocHay.WebApp.Controllers
             // Truyền dữ liệu thật vào View
             return View(result);
         }
+        // 5. Gọi AI Gợi ý
+        [HttpPost]
+        public async Task<IActionResult> GetHint([FromBody] AIHintRequestDto payload)
+        {
+            if (payload == null) return BadRequest("Dữ liệu không hợp lệ.");
+
+            var hint = await _examService.GetAIHintAsync(payload);
+            if (hint != null)
+            {
+                return Ok(new { success = true, data = hint });
+            }
+
+            return BadRequest(new { success = false, message = "Không thể lấy gợi ý từ AI." });
+        }
     }
 }
