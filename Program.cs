@@ -42,14 +42,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSession();
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // ??m b?o các file css/js/img trong wwwroot ho?t ??ng
+app.UseStaticFiles();
 
-app.UseRouting();
+app.UseRouting(); // 1. Định tuyến trước
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseSession(); // 2. Rồi mới đến Session để lưu Token
+app.UseAuthentication(); // 3. Xác thực người dùng
+app.UseAuthorization(); // 4. Kiểm tra quyền
 
 // Map các file static t? bundle m?i c?a .NET 9 (n?u có)
 app.MapStaticAssets();

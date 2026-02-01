@@ -17,17 +17,19 @@ namespace ToanHocHay.WebApp.Controllers
         // URL: /Course/Index
         public async Task<IActionResult> Index()
         {
-            // Lấy chi tiết lộ trình ID = 1 (Ví dụ: Toán lớp 6)
-            // Lưu ý: Dữ liệu này cần được API trả về dạng Nested JSON (kèm Chapters)
             var curriculum = await _courseApi.GetCurriculumDetailAsync(1);
+
+            // THÊM DÒNG NÀY ĐỂ KIỂM TRA TRONG CỬA SỔ OUTPUT
+            if (curriculum != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"CHECK: Đã nhận được {curriculum.Chapters?.Count ?? 0} chương từ Service");
+            }
 
             if (curriculum == null)
             {
-                // Nếu không tìm thấy, gửi một object rỗng để View không bị lỗi NullReference
                 return View(new CurriculumDto { Chapters = new List<ChapterDto>() });
             }
 
-            // Gửi duy nhất 1 CurriculumDto khớp với khai báo @model trong Canvas
             return View(curriculum);
         }
 

@@ -32,10 +32,24 @@ namespace ToanHocHay.WebApp.Services
         /// </summary>
         private void AddAuthHeader()
         {
-            var token = _httpContextAccessor.HttpContext?.Session.GetString("Token");
+            // 1. Luôn xóa Header cũ để tránh "rác" Authorization
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+
+            var context = _httpContextAccessor.HttpContext;
+            if (context == null) return;
+
+            // 2. Lấy Token từ Session (đảm bảo key "Token" khớp với AccountController)
+            var token = context.Session.GetString("Token");
+
             if (!string.IsNullOrEmpty(token))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
+            }
+            else
+            {
+                // Debug nếu không lấy được token từ Session
+                Console.WriteLine("[DEBUG] CourseApiService: Không tìm thấy Token trong Session!");
             }
         }
 
@@ -122,29 +136,18 @@ namespace ToanHocHay.WebApp.Services
         /// Lấy toàn bộ cấu trúc phân cấp của chương trình học (Chương -> Chủ đề -> Bài học)
         /// URL: GET /api/Curriculum/{id}
         /// </summary>
-        public async Task<CurriculumDto?> GetCurriculumDetailAsync(int curriculumId)
+        public async Task<CurriculumDto> GetCurriculumDetailAsync(int id)
         {
-            try
-            {
-                AddAuthHeader();
-                var response = await _httpClient.GetAsync($"{ApiConstant.apiBaseUrl}/api/Curriculum/{curriculumId}");
+            // Gọi đến API
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<CurriculumDto>>($"https://localhost:7290/api/Curriculum/{id}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var resString = await response.Content.ReadAsStringAsync();
-                    // THÊM DÒNG NÀY:
-                    Console.WriteLine("DỮ LIỆU THÔ TỪ API: " + resString);
-
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<CurriculumDto>>(resString, _jsonOptions);
-                    return apiResponse?.Data;
-                }
-                return null;
-            }
-            catch (Exception ex)
+            // CHÚ Ý: Phải trả về response.Data (là cái ruột chứa Chapters)
+            if (response != null && response.Success)
             {
-                Console.WriteLine($"--- Lỗi GetCurriculumDetail: {ex.Message} ---");
-                return null;
+                return response.Data;
             }
+
+            return null;
         }
 
         /// <summary>
