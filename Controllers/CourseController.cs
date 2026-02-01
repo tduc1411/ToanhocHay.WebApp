@@ -37,12 +37,15 @@ namespace ToanHocHay.WebApp.Controllers
         // URL: /Course/Learning/id
         public async Task<IActionResult> Learning(int id)
         {
+            // 1. Lấy chi tiết bài học hiện tại (để hiện nội dung chính)
             var lesson = await _courseApi.GetLessonDetailAsync(id);
             if (lesson == null) return NotFound();
 
-            ViewBag.RelatedLessons = await _courseApi.GetLessonsByTopicAsync(lesson.TopicId);
+            // 2. Lấy toàn bộ cấu trúc chương trình (để hiện danh sách chương/bài bên phải)
+            // Giả sử bài học thuộc CurriculumId = 1, bạn có thể lấy động từ lesson nếu có field này
+            var curriculum = await _courseApi.GetCurriculumDetailAsync(1);
+            ViewBag.FullCurriculum = curriculum;
 
-            // Sửa ở đây: Thêm chữ "Lesson" vào trong View()
             return View("Lesson", lesson);
         }
     }

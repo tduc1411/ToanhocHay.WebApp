@@ -37,13 +37,6 @@
                        class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold text-sm">
                 <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
             </div>
-
-            <div class="flex gap-4 w-full md:w-auto">
-                <select id="sortOrder" onchange="sortLessons()" class="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white outline-none text-sm font-black text-slate-700 cursor-pointer shadow-sm">
-                    <option value="default">Sắp xếp: Mặc định</option>
-                    <option value="az">Tên bài học: A-Z</option>
-                </select>
-            </div>
         </div>
     </div>
 
@@ -242,18 +235,7 @@
             document.getElementById('found-count').innerText = totalFound;
         }
 
-        function sortLessons() {
-            const sortVal = document.getElementById('sortOrder').value;
-            const chapterLists = document.querySelectorAll('.lesson-list');
-
-            chapterLists.forEach(list => {
-                const cards = Array.from(list.querySelectorAll('.lesson-card'));
-                if (sortVal === 'az') {
-                    cards.sort((a, b) => a.getAttribute('data-name').localeCompare(b.getAttribute('data-name')));
-                    cards.forEach(card => list.appendChild(card));
-                }
-            });
-        }
+        
 
         function resetFilters() {
             document.getElementById('lessonSearch').value = '';
