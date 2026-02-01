@@ -40,10 +40,10 @@ namespace ToanHocHay.WebApp.Controllers
             var lesson = await _courseApi.GetLessonDetailAsync(id);
             if (lesson == null) return NotFound();
 
-            // Lấy danh sách bài học liên quan trong cùng chủ đề để hiện ở Sidebar
             ViewBag.RelatedLessons = await _courseApi.GetLessonsByTopicAsync(lesson.TopicId);
 
-            return View(lesson);
+            // Sửa ở đây: Thêm chữ "Lesson" vào trong View()
+            return View("Lesson", lesson);
         }
     }
 }
