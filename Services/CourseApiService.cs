@@ -139,7 +139,7 @@ namespace ToanHocHay.WebApp.Services
         public async Task<CurriculumDto> GetCurriculumDetailAsync(int id)
         {
             // Gọi đến API
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<CurriculumDto>>($"https://localhost:7290/api/Curriculum/{id}");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<CurriculumDto>>($"http://103.98.152.182/api/Curriculum/{id}");
 
             // CHÚ Ý: Phải trả về response.Data (là cái ruột chứa Chapters)
             if (response != null && response.Success)
