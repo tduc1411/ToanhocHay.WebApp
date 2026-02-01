@@ -18,7 +18,12 @@ namespace ToanHocHay.WebApp.Services
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
             // Cấu hình để không phân biệt chữ hoa chữ thường khi giải mã JSON từ API
-            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            // VÀ giữ nguyên PascalCase khi gửi đi để khớp với Backend (PropertyNamingPolicy = null)
+            _jsonOptions = new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = null 
+            };
         }
 
         /// <summary>
@@ -91,31 +96,34 @@ namespace ToanHocHay.WebApp.Services
         }
 
         // 3. Bắt đầu làm bài (Tạo AttemptId)
-        public async Task<int> StartExercise(int exerciseId, int studentId)
+        public async Task<(int attemptId, string? error)> StartExercise(int exerciseId, int studentId)
         {
             try
             {
                 AddAuthHeader();
-                var payload = new { ExerciseId = exerciseId, StudentId = studentId };
-                var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/start", payload);
+                
+                // Sửa lỗi: Backend dùng NamingPolicy = null (PascalCase), 
+                // nên ta phải ép kiểu về DTO cụ thể hoặc dùng Options để giữ nguyên chữ Hoa đầu
+                var payload = new StartExerciseDto { ExerciseId = exerciseId, StudentId = studentId };
+                var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/start", payload, _jsonOptions);
 
                 var resString = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    // In log lỗi chi tiết từ Backend để debug nhanh
-                    Console.WriteLine($"--- LỖI API START: {resString} ---");
-                    return 0;
+                    // Lấy message lỗi từ ApiResponse của Backend nếu có
+                    var errResponse = JsonSerializer.Deserialize<ApiResponse<object>>(resString, _jsonOptions);
+                    return (0, errResponse?.Message ?? "Lỗi từ phía máy chủ API.");
                 }
 
                 // Giải mã JSON dựa trên class ExerciseAttemptDto vừa tạo
                 var apiResult = JsonSerializer.Deserialize<ApiResponse<ExerciseAttemptDto>>(resString, _jsonOptions);
-                return apiResult?.Data?.AttemptId ?? 0;
+                return (apiResult?.Data?.AttemptId ?? 0, apiResult?.Message);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"--- LỖI KẾT NỐI START EXERCISE: {ex.Message} ---");
-                return 0;
+                return (0, "Không thể kết nối tới máy chủ.");
             }
         }
 

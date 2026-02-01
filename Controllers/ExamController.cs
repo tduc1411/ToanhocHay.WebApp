@@ -51,10 +51,13 @@ namespace ToanHocHay.WebApp.Controllers
             if (exam == null) return NotFound("Không tìm thấy đề thi.");
 
             int studentId = int.Parse(studentIdClaim.Value);
-            int attemptId = await _examService.StartExercise(id, studentId);
-
-            if (attemptId == 0) return BadRequest("Không thể bắt đầu lượt làm bài. Kiểm tra log API để biết chi tiết.");
-
+            var (attemptId, error) = await _examService.StartExercise(id, studentId);
+            
+            if (attemptId == 0)
+            {
+                // Thay vì thông báo chung chung, bro hiển thị luôn lỗi từ Backend trả về
+                return BadRequest(error ?? "Không thể bắt đầu lượt làm bài. Kiểm tra log API để biết chi tiết.");
+            }
             ViewData["AttemptId"] = attemptId;
             return View(exam);
         }
