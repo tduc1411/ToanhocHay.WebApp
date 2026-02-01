@@ -15,18 +15,14 @@ namespace ToanHocHay.WebApp.Controllers
 
         // Trang hiển thị lộ trình học tập chi tiết (Chapters -> Topics -> Lessons)
         // URL: /Course/Index
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id = 1)
         {
-            var curriculum = await _courseApi.GetCurriculumDetailAsync(1);
-
-            // THÊM DÒNG NÀY ĐỂ KIỂM TRA TRONG CỬA SỔ OUTPUT
-            if (curriculum != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"CHECK: Đã nhận được {curriculum.Chapters?.Count ?? 0} chương từ Service");
-            }
+            // Gọi Service với id linh hoạt
+            var curriculum = await _courseApi.GetCurriculumDetailAsync(id);
 
             if (curriculum == null)
             {
+                // Tránh lỗi null reference ở View bằng cách khởi tạo list trống
                 return View(new CurriculumDto { Chapters = new List<ChapterDto>() });
             }
 
