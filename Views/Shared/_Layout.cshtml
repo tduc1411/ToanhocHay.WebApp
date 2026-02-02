@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ToanHocHay</title>
     <link rel="icon" type="image/x-icon" href="/logo_header.ico">
-
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -475,5 +475,226 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const duration = 10 * 1000; // 10 giây
+            const animationEnd = Date.now() + duration;
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            // Hàm tạo pháo bay lên rồi nổ
+            function launchFirework() {
+                const startX = Math.random();
+                const endY = Math.random() * 0.3 + 0.1;
+                const launchDuration = randomInRange(1000, 1400);
+                const startTime = Date.now();
+
+                const trailColors = [
+                    ['#FFD700', '#FFA500'],
+                    ['#FF0000', '#FF4500'],
+                    ['#FFFFFF', '#FFF59D']
+                ];
+                const selectedTrail = trailColors[Math.floor(Math.random() * trailColors.length)];
+
+                // Vẽ vệt bay lên
+                function animateTrail() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / launchDuration, 1);
+
+                    if (progress < 1) {
+                        const currentY = 1 - (progress * (1 - endY));
+
+                        confetti({
+                            particleCount: 2,
+                            startVelocity: 0,
+                            spread: 8,
+                            origin: { x: startX, y: currentY },
+                            colors: selectedTrail,
+                            scalar: 0.6,
+                            gravity: 0.3,
+                            ticks: 25,
+                            drift: randomInRange(-0.3, 0.3)
+                        });
+
+                        requestAnimationFrame(animateTrail);
+                    } else {
+                        explodeFirework(startX, endY);
+                    }
+                }
+
+                animateTrail();
+            }
+
+            // Hàm tạo vụ nổ với nhiều kiểu khác nhau
+            function explodeFirework(x, y) {
+                const fireworkType = Math.floor(Math.random() * 7); // Tăng lên 7 loại
+
+                switch(fireworkType) {
+                    case 0: // Pháo nổ tròn chuẩn
+                        confetti({
+                            particleCount: 120,
+                            spread: 360,
+                            startVelocity: 38,
+                            origin: { x, y },
+                            colors: ['#FFD700', '#FF0000', '#FF4500', '#FFFF00'],
+                            scalar: randomInRange(0.8, 1.6),
+                            gravity: 0.9,
+                            drift: randomInRange(-1.5, 1.5),
+                            ticks: 150
+                        });
+                        break;
+
+                    case 1: // Pháo bắn LỆCH - chỉ một bên
+                        confetti({
+                            particleCount: 100,
+                            spread: 120,
+                            angle: randomInRange(60, 120), // Góc bắn lệch
+                            startVelocity: 45,
+                            origin: { x, y },
+                            colors: ['#00E676', '#FFD700', '#FFFFFF'],
+                            scalar: randomInRange(1, 1.8),
+                            gravity: 1,
+                            drift: randomInRange(-2, 2),
+                            ticks: 180
+                        });
+                        break;
+
+                    case 2: // Pháo hình TIM (2 nửa không đối xứng)
+                        // Nửa trái
+                        confetti({
+                            particleCount: 60,
+                            spread: 90,
+                            angle: 135,
+                            startVelocity: 35,
+                            origin: { x, y },
+                            colors: ['#E91E63', '#FF1744'],
+                            scalar: randomInRange(1, 1.5),
+                            gravity: 0.8,
+                            ticks: 140
+                        });
+                        // Nửa phải
+                        setTimeout(() => {
+                            confetti({
+                                particleCount: 60,
+                                spread: 90,
+                                angle: 45,
+                                startVelocity: 35,
+                                origin: { x, y },
+                                colors: ['#E91E63', '#FF1744'],
+                                scalar: randomInRange(1, 1.5),
+                                gravity: 0.8,
+                                ticks: 140
+                            });
+                        }, 50);
+                        break;
+
+                    case 3: // Pháo CHỮ V (góc nhọn)
+                        confetti({
+                            particleCount: 80,
+                            spread: 60,
+                            angle: 225, // Góc chéo xuống trái
+                            startVelocity: 40,
+                            origin: { x, y },
+                            colors: ['#2196F3', '#03A9F4', '#FFFFFF'],
+                            shapes: ['line'],
+                            scalar: randomInRange(1.2, 2),
+                            gravity: 1.1,
+                            ticks: 200
+                        });
+                        confetti({
+                            particleCount: 80,
+                            spread: 60,
+                            angle: 315, // Góc chéo xuống phải
+                            startVelocity: 40,
+                            origin: { x, y },
+                            colors: ['#2196F3', '#03A9F4', '#FFFFFF'],
+                            shapes: ['line'],
+                            scalar: randomInRange(1.2, 2),
+                            gravity: 1.1,
+                            ticks: 200
+                        });
+                        break;
+
+                    case 4: // Pháo XOẮN ỐC (spiral)
+                        for (let i = 0; i < 6; i++) {
+                            setTimeout(() => {
+                                confetti({
+                                    particleCount: 20,
+                                    spread: 40,
+                                    angle: i * 60, // Xoay dần
+                                    startVelocity: 30,
+                                    origin: { x, y },
+                                    colors: ['#9C27B0', '#E91E63', '#FFD700'],
+                                    scalar: 1.2,
+                                    gravity: 0.7,
+                                    ticks: 100
+                                });
+                            }, i * 80);
+                        }
+                        break;
+
+                    case 5: // Pháo RƠI THÁC (waterfall)
+                        confetti({
+                            particleCount: 150,
+                            spread: 45,
+                            angle: 270, // Rơi thẳng xuống
+                            startVelocity: 50,
+                            origin: { x, y },
+                            colors: ['#00BCD4', '#4DD0E1', '#FFFFFF'],
+                            shapes: ['line'],
+                            scalar: randomInRange(1.5, 2.5),
+                            gravity: 1.5, // Rơi nhanh
+                            ticks: 250
+                        });
+                        break;
+
+                    case 6: // Pháo KIM TUYẾN lấp lánh
+                        confetti({
+                            particleCount: 90,
+                            spread: 180,
+                            startVelocity: 32,
+                            origin: { x, y },
+                            colors: ['#FFFFFF', '#FFD700', '#FFF59D', '#FFEB3B'],
+                            shapes: ['star'],
+                            scalar: randomInRange(0.9, 1.7),
+                            gravity: 0.6,
+                            drift: randomInRange(-2, 2),
+                            ticks: 130
+                        });
+                        break;
+                }
+            }
+
+            // Bắn nhiều hơn
+            const interval = setInterval(() => {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                // Bắn 1-2 quả mỗi lần
+                const numFireworks = Math.random() > 0.4 ? 2 : 1;
+
+                for (let i = 0; i < numFireworks; i++) {
+                    setTimeout(() => {
+                        launchFirework();
+                    }, i * 300);
+                }
+
+            }, 1000); // Mỗi 1 giây
+
+            // Grand Finale
+            setTimeout(() => {
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        launchFirework();
+                    }, i * 200);
+                }
+            }, duration - 2500);
+        });
+    </script>
 </body>
 </html>
