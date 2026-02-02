@@ -54,9 +54,6 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <a href="Dashboard" class="hidden md:flex items-center gap-2 bg-blue-50 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-xl font-bold transition-all text-sm border border-blue-100">
-                <i class="fa-solid fa-chart-line"></i> Bảng điều khiển
-            </a>
             <div class="h-8 w-[1px] bg-gray-200 hidden md:block"></div>
             <div class="flex items-center gap-3">
                 <span class="text-gray-600 font-semibold hidden md:block">@user.FullName</span>
@@ -134,8 +131,10 @@
                             </div>
                         </div>
                         <div class="pt-4 border-t border-gray-100 flex justify-end">
-                            <button type="submit" class="bg-primary hover:bg-blue-600 text-white font-bold py-3 px-10 rounded-xl transition shadow-lg shadow-blue-100 flex items-center gap-2">
-                                <i class="fa-solid fa-check"></i> Cập nhật ngay
+                            @* Thay bg-primary bằng bg-blue-500 để chắc chắn có màu nền *@
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-10 rounded-xl transition shadow-lg shadow-blue-100 flex items-center gap-2 border-none outline-none">
+                                <i class="fa-solid fa-check"></i>
+                                <span>Cập nhật ngay</span>
                             </button>
                         </div>
                     </form>

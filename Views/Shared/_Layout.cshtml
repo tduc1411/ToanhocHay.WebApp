@@ -169,43 +169,52 @@
 
                         <div class="flex items-center gap-3 flex-shrink-0">
                             <div class="h-6 w-px bg-gray-200 mx-1 hidden md:block"></div>
+                            <div class="flex items-center gap-3 flex-shrink-0">
+                                <div class="h-6 w-px bg-gray-200 mx-1 hidden md:block"></div>
 
-                            @if (User.Identity != null && User.Identity.IsAuthenticated)
-                            {
-                                <div class="relative group">
-                                    <button class="flex items-center gap-3 px-4 py-2.5 rounded-full hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border border-transparent hover:border-blue-200">
-                                        @* QUAN TRỌNG: Phải có id="global-header-avatar" ở đây *@
-                                        <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=@User.Identity.Name"
-                                             alt="Avatar"
-                                             id="global-header-avatar"
-                                             class="w-10 h-10 rounded-full object-cover border-2 border-blue-200 shadow-sm" />
+                                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                {
+                                    @* 1. Nút Dashboard nằm ngay bên cạnh Profile *@
+                                    <a href="/Student/Dashboard" class="hidden lg:flex items-center gap-2 bg-blue-50 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-xl font-bold transition-all text-sm border border-blue-100 shadow-sm active:scale-95">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                        <span>Dashboard</span>
+                                    </a>
 
-                                        <span class="font-bold text-sm text-gray-700">
-                                            @User.Identity.Name
-                                        </span>
-                                        <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform group-hover:rotate-180"></i>
-                                    </button>
+                                    @* 2. Cụm Profile người dùng *@
+                                    <div class="relative group">
+                                        <button class="flex items-center gap-3 px-2 py-1.5 rounded-full hover:bg-gray-50 transition-all duration-300">
+                                            <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=@User.Identity.Name"
+                                                 alt="Avatar"
+                                                 id="global-header-avatar"
+                                                 class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm ring-1 ring-gray-100" />
 
-                                    <div class="dropdown-menu absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                                        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3 text-white font-bold text-sm">
-                                            @User.Identity.Name
+                                            <div class="flex flex-col items-start leading-tight hidden sm:flex">
+                                                <span class="font-bold text-xs text-gray-400 uppercase tracking-tighter">Học sinh</span>
+                                                <span class="font-bold text-sm text-gray-800">@User.Identity.Name</span>
+                                            </div>
+                                            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 transition-transform group-hover:rotate-180"></i>
+                                        </button>
+
+                                        @* Dropdown menu khi hover vào Avatar (chỉ còn Hồ sơ & Đăng xuất cho gọn) *@
+                                        <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                                            <a href="/Student/Profile" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-blue-50 transition-all">
+                                                <i class="fa-solid fa-user-gear w-5"></i> Hồ sơ
+                                            </a>
+                                            <a href="/Account/Logout" class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                                                <i class="fa-solid fa-right-from-bracket w-5"></i> Đăng xuất
+                                            </a>
                                         </div>
-                                        <a href="/Student/Profile" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-blue-50 transition-all">
-                                            <i class="fa-solid fa-user w-5"></i> Hồ sơ
-                                        </a>
-                                        <a href="/Account/Logout" class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50">
-                                            <i class="fa-solid fa-right-from-bracket w-5"></i> Đăng xuất
-                                        </a>
                                     </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="flex items-center gap-3">
-                                    <a href="/Account/Register" class="px-6 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all duration-300">Đăng Ký</a>
-                                    <a href="/Account/Login" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">Đăng Nhập</a>
-                                </div>
-                            }
+                                }
+                                else
+                                {
+                                    @* 3. Nút cho khách chưa đăng nhập *@
+                                    <div class="flex items-center gap-3">
+                                        <a href="/Account/Register" class="px-6 py-2.5 rounded-full border-2 border-blue-600 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all">Đăng Ký</a>
+                                        <a href="/Account/Login" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all transform active:scale-95">Đăng Nhập</a>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
 
