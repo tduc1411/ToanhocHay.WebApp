@@ -14,7 +14,7 @@
     // --- 0. TRIGGER: PAGE LOAD ---
     async function triggerPageLoad() {
         if (triggersSent.page_load) return;
-        
+
         const response = await fetch('/Chat/Trigger', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -23,7 +23,7 @@
 
         const data = await response.json();
         triggersSent.page_load = true;
-        handleBotResponse(data.response || data);
+        handleBotResponse(data);
     }
 
     // --- TRIGGER: WAIT 15 SECONDS (if no interaction) ---
@@ -35,7 +35,7 @@
                 body: JSON.stringify({ trigger: 'wait_15s' })
             }).then(r => r.json()).then(data => {
                 triggersSent.wait_15s = true;
-                handleBotResponse(data.response || data);
+                handleBotResponse(data);
             });
         }
     }, 15000); // 15 seconds
@@ -54,7 +54,7 @@
                 body: JSON.stringify({ trigger: 'scroll_70' })
             }).then(r => r.json()).then(data => {
                 triggersSent.scroll_70 = true;
-                handleBotResponse(data.response || data);
+                handleBotResponse(data);
             });
         }
     });
@@ -82,7 +82,7 @@
             });
 
             const data = await response.json();
-            handleBotResponse(data.response || data);
+            handleBotResponse(data);
         } catch (error) {
             appendMessage('Xin lỗi, chatbot đang bận.', 'bot');
         }
@@ -115,15 +115,36 @@
     }
 
     // --- 3. HÀM XỬ LÝ PHẢN HỒI TỪ BOT ---
-    function handleBotResponse(res) {
-        if (!res) return;
+    function handleBotResponse(data) {
+        console.log("[Chatbot] Full data received:", data);
+        if (!data) return;
 
-        // Hiển thị message (hỗ trợ cả viết hoa/thường từ API)
-        const message = (res.response && res.response.message) || res.message || res.Message || "Mình chưa hiểu ý bạn...";
-        appendMessage(message, 'bot');
+        // Backend có thể trả về Success/success, Response/response
+        const isSuccess = data.Success !== undefined ? data.Success : data.success;
+        const res = data.Response || data.response || data;
+        const errorMsg = data.Error || data.error || (res && (res.Error || res.error));
+
+        // Nếu backend báo lỗi
+        if (isSuccess === false && errorMsg) {
+            appendMessage(`Lỗi hệ thống: ${errorMsg}`, 'bot');
+            return;
+        }
+
+        // Lấy message: Ưu tiên trong object con (res), sau đó mới ở object cha (data)
+        const message = (res && (res.Message || res.message)) || data.Message || data.message;
+
+        if (message) {
+            appendMessage(message, 'bot');
+        } else if (isSuccess === false) {
+            appendMessage("AI Server hiện không có phản hồi hợp lệ.", 'bot');
+        } else {
+            // Debug: nếu ko tìm thấy message thì hiện JSON để biết nó là gì
+            console.warn("[Chatbot] No message found in data", data);
+            appendMessage("Mình chưa hiểu ý bạn...", 'bot');
+        }
 
         // Lấy danh sách options
-        const options = (res.response && res.response.options) || res.options || res.Options || [];
+        const options = (res && (res.Options || res.options)) || data.Options || data.options || [];
 
         if (options.length > 0) {
             const optionsContainer = document.createElement('div');
@@ -135,7 +156,7 @@
                 btn.innerText = opt;
 
                 btn.onclick = () => {
-                    const selectedOption = opt.trim(); // Loại bỏ khoảng trắng thừa
+                    const selectedOption = opt.trim();
                     optionsContainer.remove();
                     sendQuickReply(selectedOption);
                 };

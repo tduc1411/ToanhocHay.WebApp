@@ -1,34 +1,33 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Net.Http.Json;
 
 namespace ToanHocHay.WebApp.Services
 {
     public class ChatApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _chatbotUrl;
 
-        public ChatApiService(HttpClient httpClient, IConfiguration configuration)
+        public ChatApiService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _chatbotUrl = configuration["AI:ChatbotApiUrl"] ?? "";
         }
 
         public async Task<JsonElement> SendMessageAsync(string userId, string text)
         {
             try
             {
-                // Dùng class để kiểm soát JSON property names chính xác
+                // Gọi tới ChatbotController của Backend C#
                 var payload = new ChatMessagePayload { UserId = userId, Text = text };
-                var response = await _httpClient.PostAsJsonAsync($"{_chatbotUrl}/message", payload);
+                var response = await _httpClient.PostAsJsonAsync("Chatbot/message", payload);
 
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<JsonElement>();
             }
             catch (Exception ex)
             {
-                return JsonDocument.Parse("{\"success\": false, \"response\": {\"message\": \"Không thể kết nối tới server AI.\"}}").RootElement;
+                return JsonDocument.Parse("{\"success\": false, \"response\": {\"message\": \"Không thể kết nối tới server backend.\"}}").RootElement;
             }
         }
 
@@ -37,23 +36,14 @@ namespace ToanHocHay.WebApp.Services
             try
             {
                 var payload = new ChatReplyPayload { UserId = userId, Reply = reply };
-
-                string baseUrl = _chatbotUrl.TrimEnd('/');
-                string requestUrl = $"{baseUrl}/quick-reply";
-
-                var response = await _httpClient.PostAsJsonAsync(requestUrl, payload);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                }
+                var response = await _httpClient.PostAsJsonAsync("Chatbot/quick-reply", payload);
 
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<JsonElement>();
             }
             catch (Exception ex)
             {
-                return JsonDocument.Parse("{\"response\": {\"message\": \"Lỗi kết nối AI. Kiểm tra Terminal Python ngay!\"}}").RootElement;
+                return JsonDocument.Parse("{\"response\": {\"message\": \"Lỗi kết nối backend.\"}}").RootElement;
             }
         }
 
@@ -62,16 +52,7 @@ namespace ToanHocHay.WebApp.Services
             try
             {
                 var payload = new ChatTriggerPayload { UserId = userId, Trigger = trigger };
-
-                string baseUrl = _chatbotUrl.TrimEnd('/');
-                string requestUrl = $"{baseUrl}/trigger";
-
-                var response = await _httpClient.PostAsJsonAsync(requestUrl, payload);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                }
+                var response = await _httpClient.PostAsJsonAsync("Chatbot/trigger", payload);
 
                 response.EnsureSuccessStatusCode();
                 var result = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -79,7 +60,7 @@ namespace ToanHocHay.WebApp.Services
             }
             catch (Exception ex)
             {
-                return JsonDocument.Parse("{\"response\": {\"message\": \"\"}}").RootElement;
+                return JsonDocument.Parse("{\"response\": {\"message\": \"Hệ thống đang bận hoặc không thể kết nối tới máy chủ. Vui lòng quay lại sau.\"}}").RootElement;
             }
         }
     }
