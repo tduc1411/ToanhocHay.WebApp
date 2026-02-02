@@ -178,26 +178,23 @@
 
                 @foreach (var member in teamMembers)
                 {
-                    <div class="group relative overflow-hidden rounded-[2rem] shadow-lg bg-gray-100">
-                        <div class="aspect-[3/4] relative">
-                            @* CHỖ QUAN TRỌNG: Thay i bằng img *@
-                            <img src="@member.Img"
-                                 alt="@member.Title"
-                                 class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
-                                 onerror="this.src='https://via.placeholder.com/300x400?text=Loi+Anh'" />
-
-                            @* Lớp phủ Gradient để làm nổi bật chữ trắng *@
-                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/20 to-transparent z-10"></div>
-
-                            <div class="absolute bottom-0 left-0 right-0 p-8 z-20 text-white transform translate-y-4 group-hover:translate-y-0 transition duration-300">
-                                <p class="text-[10px] font-black uppercase tracking-widest mb-2 text-blue-400">@member.Role</p>
-                                <h4 class="text-2xl font-black mb-2">@member.Title</h4>
-
-                                @* Nội dung mô tả hiện lên khi hover *@
-                                <p class="text-sm text-gray-300 opacity-0 group-hover:opacity-100 transition duration-500 leading-relaxed">
-                                    @member.Desc
-                                </p>
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition duration-300 flex flex-col min-h-[300px] justify-between">
+                        <div>
+                            @* Icon đại diện thay cho ảnh *@
+                            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-blue-200">
+                                <i class="fa-solid fa-user-tie"></i>
                             </div>
+
+                            <p class="text-[10px] font-black uppercase tracking-widest mb-2 text-blue-600">@member.Role</p>
+                            <h4 class="text-2xl font-black text-gray-900 mb-4">@member.Title</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                @member.Desc
+                            </p>
+                        </div>
+
+                        @* Nút xem thêm hoặc trang trí thêm nếu muốn *@
+                        <div class="mt-6 pt-6 border-t border-gray-50">
+                            <span class="text-xs font-bold text-gray-400">ToanHocHay Team</span>
                         </div>
                     </div>
                 }
