@@ -30,23 +30,51 @@
 
 @model List<ExerciseDto>
 
-<section class="bg-gradient-to-br from-blue-600 to-indigo-700 pt-12 pb-20 relative overflow-hidden">
-	<div class="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+@* --- 1. HERO SECTION ĐỒNG BỘ 100% MÀU GRADIENT VÀ CUBES --- *@
+<section class="relative bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white pt-16 pb-24 overflow-hidden">
+	@* Họa tiết khối vuông chìm *@
+	<div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+
+	@* Hiệu ứng mờ ảo (Blobs) *@
+	<div class="absolute -top-24 -right-24 w-96 h-96 bg-white opacity-10 rounded-full blur-[100px] animate-pulse"></div>
 	<div class="absolute bottom-0 left-0 w-64 h-64 bg-yellow-400 opacity-10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-	<div class="container mx-auto px-4 relative z-10 text-center text-white">
-		<h1 class="text-4xl md:text-6xl font-black mb-8 leading-tight">Thư viện Đề thi Lớp 6</h1>
-		<p class="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed font-medium">
-			Hệ thống đề thi trắc nghiệm Toán lớp 6 bám sát chương trình GDPT mới.
-			Có chấm điểm và giải thích chi tiết ngay sau khi làm bài.
-		</p>
-		<div class="max-w-2xl mx-auto bg-white p-2 rounded-full shadow-2xl flex items-center">
-			<div class="flex-1 px-4">
-				<input type="text" placeholder="Tìm kiếm đề thi (VD: Số nguyên, Hình học...)" class="w-full bg-transparent outline-none text-gray-800 placeholder-gray-400 text-sm h-10">
+
+	<div class="container mx-auto px-4 relative z-10 text-center">
+		<div class="max-w-4xl mx-auto">
+			<span class="inline-block bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-4 py-2 rounded-full mb-6 border border-white/30 tracking-widest uppercase">
+				<i class="fa-solid fa-file-signature mr-2"></i> Thư viện đề thi Lớp 6
+			</span>
+
+			<h1 class="text-4xl md:text-6xl font-black mb-8 leading-tight tracking-tight">
+				Thư viện Đề thi <br />
+				<span class="text-yellow-300">Thông minh & Hiệu quả</span>
+			</h1>
+
+			<p class="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
+				Tổng hợp đề thi bám sát chương trình GDPT mới.
+				Hệ thống tự động chấm điểm và cung cấp lời giải chi tiết ngay lập tức.
+			</p>
+
+			@* Thanh tìm kiếm đồng bộ thiết kế *@
+			<div class="max-w-2xl mx-auto bg-white p-2 rounded-2xl shadow-2xl flex items-center group focus-within:ring-4 focus-within:ring-blue-500/20 transition-all">
+				<div class="flex-1 px-4 flex items-center">
+					<i class="fa-solid fa-magnifying-glass text-gray-400 mr-3 group-focus-within:text-blue-600 transition-colors"></i>
+					<input type="text" placeholder="Tìm kiếm đề thi (VD: Giữa kỳ, Số nguyên...)"
+						   class="w-full bg-transparent outline-none text-gray-800 placeholder-gray-400 font-bold text-sm h-12">
+				</div>
+				<button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-3 px-8 rounded-xl transition shadow-md flex items-center gap-2 active:scale-95">
+					<span>Tìm kiếm</span>
+				</button>
 			</div>
-			<button class="bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold py-2.5 px-6 rounded-full transition shadow-md flex items-center gap-2">
-				<i class="fa-solid fa-magnifying-glass"></i> <span class="hidden sm:inline">Tìm kiếm</span>
-			</button>
 		</div>
+	</div>
+</section>
+
+@* --- 2. PHẦN CHUYỂN TIẾP BO GÓC --- *@
+<section class="bg-slate-50 py-12 -mt-10 relative z-20 rounded-t-[3rem] border-t border-white/50">
+	<div class="container mx-auto px-4">
+		@* Phần lọc và danh sách đề thi của bạn ở dưới giữ nguyên *@
+		...
 	</div>
 </section>
 
