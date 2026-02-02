@@ -535,9 +535,6 @@
             notification.classList.remove('show');
             notification.classList.add('hide');
             
-            // Save to localStorage to not show again
-            localStorage.setItem('chatbot_notification_shown', 'true');
-            
             setTimeout(() => {
                 notification.style.display = 'none';
             }, 400);
@@ -553,25 +550,21 @@
             }, 300);
         }
 
-        // Show notification on page load (only once per session)
+        // Show notification on every page load
         window.addEventListener('DOMContentLoaded', () => {
-            const hasSeenNotification = localStorage.getItem('chatbot_notification_shown');
-            
-            // Show notification after 2 seconds if user hasn't seen it before
-            if (!hasSeenNotification) {
-                setTimeout(() => {
-                    const notification = document.getElementById('chatbot-notification');
-                    notification.classList.add('show');
-                }, 2000);
+            // Show notification after 2 seconds on every page load
+            setTimeout(() => {
+                const notification = document.getElementById('chatbot-notification');
+                notification.classList.add('show');
+            }, 2000);
 
-                // Auto-hide after 15 seconds
-                setTimeout(() => {
-                    const notification = document.getElementById('chatbot-notification');
-                    if (notification.classList.contains('show')) {
-                        closeChatbotNotification();
-                    }
-                }, 17000);
-            }
+            // Auto-hide after 15 seconds
+            setTimeout(() => {
+                const notification = document.getElementById('chatbot-notification');
+                if (notification.classList.contains('show')) {
+                    closeChatbotNotification();
+                }
+            }, 17000);
         });
     </script>
     <script>
