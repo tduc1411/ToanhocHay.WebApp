@@ -398,6 +398,53 @@
             <span class="absolute top-0 right-0 w-4 h-4 bg-red-500 border-2 border-white rounded-full"></span>
         </button>
     </div>
+
+    <!-- Chatbot Notification Popup -->
+    <div id="chatbot-notification" class="fixed bottom-24 right-6 z-[9998] max-w-sm transform transition-all duration-500 ease-out translate-y-0 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-2xl shadow-2xl border border-blue-100 overflow-hidden">
+            <!-- Header with gradient -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center animate-pulse">
+                        <i class="fa-solid fa-robot text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white text-sm">Chào mừng bạn! 👋</p>
+                        <p class="text-xs text-blue-100">Trợ lý AI ToanHocHay</p>
+                    </div>
+                </div>
+                <button onclick="closeChatbotNotification()" class="text-white/80 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+                <p class="text-gray-700 text-sm mb-3 leading-relaxed">
+                    Mình là trợ lý AI của ToanHocHay, sẵn sàng hỗ trợ bạn 24/7! 🤖
+                </p>
+                <ul class="space-y-2 mb-4">
+                    <li class="flex items-start gap-2 text-xs text-gray-600">
+                        <i class="fa-solid fa-check-circle text-green-500 mt-0.5"></i>
+                        <span>Giải đáp thắc mắc về toán học</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-gray-600">
+                        <i class="fa-solid fa-check-circle text-green-500 mt-0.5"></i>
+                        <span>Hướng dẫn sử dụng website</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-xs text-gray-600">
+                        <i class="fa-solid fa-check-circle text-green-500 mt-0.5"></i>
+                        <span>Gợi ý bài học phù hợp</span>
+                    </li>
+                </ul>
+                <button onclick="openChatFromNotification()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2.5 rounded-lg font-bold text-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-comment-dots mr-2"></i>
+                    Bắt đầu trò chuyện
+                </button>
+            </div>
+        </div>
+    </div>
+
     <style>
         /* Hiệu ứng mở cửa sổ chat */
         #chat-window.active {
@@ -421,6 +468,39 @@
 
         #chat-messages > div {
             animation: slideIn 0.3s ease-out forwards;
+        }
+
+        /* Chatbot notification animations */
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOutToBottom {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+        }
+
+        #chatbot-notification.show {
+            opacity: 1;
+            pointer-events: auto;
+            animation: slideInFromBottom 0.5s ease-out forwards;
+        }
+
+        #chatbot-notification.hide {
+            animation: slideOutToBottom 0.4s ease-in forwards;
         }
     </style>
 
@@ -448,6 +528,51 @@
                 chatIcon.classList.add('fa-comment-dots');
             }
         }
+
+        // Chatbot notification functions
+        function closeChatbotNotification() {
+            const notification = document.getElementById('chatbot-notification');
+            notification.classList.remove('show');
+            notification.classList.add('hide');
+            
+            // Save to localStorage to not show again
+            localStorage.setItem('chatbot_notification_shown', 'true');
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 400);
+        }
+
+        function openChatFromNotification() {
+            // Close notification
+            closeChatbotNotification();
+            
+            // Open chat window
+            setTimeout(() => {
+                toggleChat();
+            }, 300);
+        }
+
+        // Show notification on page load (only once per session)
+        window.addEventListener('DOMContentLoaded', () => {
+            const hasSeenNotification = localStorage.getItem('chatbot_notification_shown');
+            
+            // Show notification after 2 seconds if user hasn't seen it before
+            if (!hasSeenNotification) {
+                setTimeout(() => {
+                    const notification = document.getElementById('chatbot-notification');
+                    notification.classList.add('show');
+                }, 2000);
+
+                // Auto-hide after 15 seconds
+                setTimeout(() => {
+                    const notification = document.getElementById('chatbot-notification');
+                    if (notification.classList.contains('show')) {
+                        closeChatbotNotification();
+                    }
+                }, 17000);
+            }
+        });
     </script>
     <script>
         // Lấy UserId từ định danh đã đăng nhập hoặc dùng ID của phiên làm việc
