@@ -120,6 +120,22 @@ namespace ToanHocHay.WebApp.Services
                 return null;
             }
         }
+        // Thêm vào CourseApiService.cs phía WebApp
+        public async Task<List<CurriculumDto>> GetFullMenuTreeAsync()
+        {
+            try
+            {
+                AddAuthHeader();
+                // Gọi tới endpoint mới tạo ở Bước 1
+                var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<CurriculumDto>>>("Curriculum/full-tree", _jsonOptions);
+                return response?.Data ?? new List<CurriculumDto>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi lấy cây menu: {ex.Message}");
+                return new List<CurriculumDto>();
+            }
+        }
 
         public async Task<List<ExerciseDto>> GetExercisesByTopicAsync(int topicId)
         {

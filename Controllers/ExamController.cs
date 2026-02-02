@@ -30,34 +30,29 @@ namespace ToanHocHay.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> DoExam(int id)
         {
-            if (id <= 0) return BadRequest("Mã đề thi không hợp lệ.");
+            if (id <= 0) return RedirectToAction("Index", new { msg = "Mã đề thi không hợp lệ." });
 
             if (!User.Identity!.IsAuthenticated)
-            {
                 return RedirectToAction("Login", "Account");
-            }
 
-            // FIX QUAN TRỌNG: Tìm đúng chuỗi "StudentId" khớp với AccountController
             var studentIdClaim = User.FindFirst("StudentId");
-
             if (studentIdClaim == null)
-            {
-                // Nếu vào đây, nghĩa là Cookie của bro không có mã học sinh
-                // Nguyên nhân: Do API trả về StudentId null HOẶC bro chưa đăng nhập lại sau khi sửa code
-                return Unauthorized("Tài khoản không phải là học sinh.");
-            }
+                return RedirectToAction("Index", new { msg = "Tài khoản không phải học sinh." });
 
             var exam = await _examService.GetExerciseById(id);
-            if (exam == null) return NotFound("Không tìm thấy đề thi.");
+            if (exam == null)
+                return RedirectToAction("Index", new { msg = "Không tìm thấy đề thi." });
 
             int studentId = int.Parse(studentIdClaim.Value);
             var (attemptId, error) = await _examService.StartExercise(id, studentId);
-            
+
             if (attemptId == 0)
             {
-                // Thay vì thông báo chung chung, bro hiển thị luôn lỗi từ Backend trả về
-                return BadRequest(error ?? "Không thể bắt đầu lượt làm bài. Kiểm tra log API để biết chi tiết.");
+                // Thay vì BadRequest, ta quay về trang danh sách và đính kèm thông báo lỗi
+                TempData["ErrorMessage"] = error ?? "Lỗi dữ liệu không hợp lệ (ExerciseType).";
+                return RedirectToAction("Index");
             }
+
             ViewData["AttemptId"] = attemptId;
             return View(exam);
         }

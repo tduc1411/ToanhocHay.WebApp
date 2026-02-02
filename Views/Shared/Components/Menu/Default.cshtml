@@ -1,0 +1,51 @@
+﻿@using ToanHocHay.WebApp.Models.DTOs
+@model List<CurriculumDto>
+
+
+<ul class="dropdown-menu absolute left-0 top-full mt-3 w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl z-50 py-3 transition-all duration-300">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var curr in Model)
+        {
+            <div class="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 mb-2">
+                <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">@curr.CurriculumName</p>
+            </div>
+
+            @if (curr.Chapters != null)
+            {
+                @foreach (var chapter in curr.Chapters)
+                {
+                    <li class="relative group/sub">
+                        <a href="/Course/Chapter/@chapter.ChapterId" class="px-5 py-3.5 flex justify-between items-center text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-primary transition-all">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-book-open text-blue-500 text-xs"></i>
+                                <span class="truncate w-44">@chapter.ChapterName</span>
+                            </span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-300"></i>
+                        </a>
+
+                        @* Menu con: Danh sách bài học (Topics) *@
+                        @if (chapter.Topics != null && chapter.Topics.Any())
+                        {
+                            <ul class="dropdown-submenu w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 left-full top-0 ml-1 hidden group-hover/sub:block absolute">
+                                @foreach (var topic in chapter.Topics)
+                                {
+                                    <li>
+                                        <a href="/Course/Learning/@topic.TopicId" class="flex items-center gap-3 px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-blue-50 hover:text-primary transition-colors">
+                                            <i class="fa-solid fa-circle-play text-blue-400 text-[10px]"></i>
+                                            <span class="truncate">@topic.TopicName</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            }
+        }
+    }
+    else
+    {
+        <li class="px-5 py-3 text-sm text-gray-400 italic">Đang cập nhật bài giảng...</li>
+    }
+</ul>

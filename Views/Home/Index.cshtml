@@ -13,12 +13,16 @@
         <div class="hero-slide w-full flex-shrink-0 relative">
             <img src="~/images/banner/banner_01.png" class="w-full h-auto object-contain" alt="ToanHocHay Banner">
         </div>
+        <div class="hero-slide w-full flex-shrink-0 relative">
+            <img src="~/images/banner/banner_04.png" class="w-full h-auto object-contain" alt="ToanHocHay Banner">
+        </div>
     </div>
 
     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-        <button class="hero-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition scale-125" onclick="goToSlide(0)"></button>
+        <button class="hero-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition" onclick="goToSlide(0)"></button>
         <button class="hero-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition" onclick="goToSlide(1)"></button>
         <button class="hero-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition" onclick="goToSlide(2)"></button>
+        <button class="hero-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition" onclick="goToSlide(3)"></button>
     </div>
 
     <button onclick="prevSlide()" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition opacity-0 group-hover:opacity-100 z-20">
@@ -628,24 +632,60 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+                document.addEventListener('DOMContentLoaded', () => {
             // === SLIDER ===
             let currentSlide = 0;
             const slides = document.querySelectorAll('.hero-slide');
             const track = document.getElementById('hero-track');
             const dots = document.querySelectorAll('.hero-dot');
             const totalSlides = slides.length;
+
+            // Nếu không có slide nào thì thoát để tránh lỗi console
+            if (totalSlides === 0) return;
+
             function updateSlider() {
-                if(track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
+                if (track) {
+                    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+                }
+
+                // Cập nhật dots bằng classList để giữ lại các class gốc của Tailwind
                 dots.forEach((dot, index) => {
-                    dot.className = index === currentSlide ? 'hero-dot w-2 h-2 rounded-full bg-white transition scale-125' : 'hero-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition';
+                    if (index === currentSlide) {
+                        dot.classList.add('bg-white', 'scale-125');
+                        dot.classList.remove('bg-white/50');
+                    } else {
+                        dot.classList.remove('bg-white', 'scale-125');
+                        dot.classList.add('bg-white/50');
+                    }
                 });
             }
-            function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSlider(); }
-            window.prevSlide = function() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSlider(); }
-            window.nextSlide = nextSlide;
-            window.goToSlide = function(index) { currentSlide = index; updateSlider(); }
-            setInterval(nextSlide, 4000);
+
+            // Gán hàm vào window để các nút onclick="nextSlide()" ở HTML gọi được
+            window.nextSlide = function() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateSlider();
+            };
+
+            window.prevSlide = function() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateSlider();
+            };
+
+            window.goToSlide = function(index) {
+                currentSlide = index;
+                updateSlider();
+            };
+
+            // Tự động chuyển slide mỗi 4 giây
+            let autoSlide = setInterval(window.nextSlide, 4000);
+
+            // Mẹo: Dừng auto slide khi người dùng di chuột vào banner để họ kịp đọc chữ
+            const sliderContainer = document.querySelector('section.group');
+            if (sliderContainer) {
+                sliderContainer.addEventListener('mouseenter', () => clearInterval(autoSlide));
+                sliderContainer.addEventListener('mouseleave', () => autoSlide = setInterval(window.nextSlide, 4000));
+            }
+
             updateSlider();
         });
 

@@ -229,53 +229,7 @@
                                     <i class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-300 group-hover:rotate-180"></i>
                                 </a>
 
-                                <ul class="dropdown-menu absolute left-0 top-full mt-3 w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl z-50 py-3 before:absolute before:-top-3 before:left-0 before:w-full before:h-3 before:bg-transparent">
-                                    <div class="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 mb-2">
-                                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Chọn môn học</p>
-                                    </div>
-
-                                    <li class="relative group/sub">
-                                        <a href="#" class="px-5 py-3.5 flex justify-between items-center text-sm font-semibold text-gray-700 hover:bg-blue-50 hover:text-primary transition-all duration-200">
-                                            <span class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                                                    <i class="fa-solid fa-calculator text-blue-600"></i>
-                                                </div>
-                                                <span>Đại số</span>
-                                            </span>
-                                            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
-                                        </a>
-
-                                        <ul class="dropdown-submenu w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 before:absolute before:top-0 before:-left-4 before:w-4 before:h-full before:bg-transparent">
-                                            <div class="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 mb-2">
-                                                <p class="text-xs font-bold text-blue-700 uppercase tracking-wider">Chương trình Đại số</p>
-                                            </div>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary transition-all"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 1: Số tự nhiên</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-primary"><i class="fa-solid fa-circle-dot text-xs text-blue-400"></i>Chương 2: Số nguyên</a></li>
-                                        </ul>
-                                    </li>
-
-                                    <div class="h-px bg-gray-100 my-2"></div>
-
-                                    <li class="relative group/sub">
-                                        <a href="#" class="px-5 py-3.5 flex justify-between items-center text-sm font-semibold text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200">
-                                            <span class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                                                    <i class="fa-solid fa-shapes text-orange-600"></i>
-                                                </div>
-                                                <span>Hình học</span>
-                                            </span>
-                                            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
-                                        </a>
-
-                                        <ul class="dropdown-submenu w-72 bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 before:absolute before:top-0 before:-left-4 before:w-4 before:h-full before:bg-transparent">
-                                            <div class="px-4 py-2 bg-gradient-to-r from-orange-50 to-amber-50 mb-2">
-                                                <p class="text-xs font-bold text-orange-700 uppercase tracking-wider">Chương trình Hình học</p>
-                                            </div>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Hình học trực quan</a></li>
-                                            <li><a href="/Course/Lesson" class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-orange-600"><i class="fa-solid fa-circle-dot text-xs text-orange-400"></i>Tam giác & Tứ giác</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                                @await Component.InvokeAsync("Menu")
                             </li>
 
                             <li>
