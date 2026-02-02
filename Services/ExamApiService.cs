@@ -101,29 +101,34 @@ namespace ToanHocHay.WebApp.Services
             try
             {
                 AddAuthHeader();
-                
-                // Sửa lỗi: Backend dùng NamingPolicy = null (PascalCase), 
-                // nên ta phải ép kiểu về DTO cụ thể hoặc dùng Options để giữ nguyên chữ Hoa đầu
-                var payload = new StartExerciseDto { ExerciseId = exerciseId, StudentId = studentId };
-                var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/start", payload, _jsonOptions);
+                var payload = new { ExerciseId = exerciseId, StudentId = studentId };
 
+                // Gọi API
+                var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/start", payload, _jsonOptions);
                 var resString = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    // Lấy message lỗi từ ApiResponse của Backend nếu có
-                    var errResponse = JsonSerializer.Deserialize<ApiResponse<object>>(resString, _jsonOptions);
-                    return (0, errResponse?.Message ?? "Lỗi từ phía máy chủ API.");
+                    // In ra log để xem Backend thực sự báo lỗi gì (Ví dụ: 401 Unauthorized)
+                    Console.WriteLine($"--- LỖI BACKEND: {resString}");
+                    return (0, "Máy chủ từ chối yêu cầu (có thể do hết hạn phiên làm việc).");
                 }
 
-                // Giải mã JSON dựa trên class ExerciseAttemptDto vừa tạo
+                // Dùng dynamic hoặc kiểm tra kỹ Data null
                 var apiResult = JsonSerializer.Deserialize<ApiResponse<ExerciseAttemptDto>>(resString, _jsonOptions);
-                return (apiResult?.Data?.AttemptId ?? 0, apiResult?.Message);
+
+                if (apiResult != null && apiResult.Success && apiResult.Data != null)
+                {
+                    return (apiResult.Data.AttemptId, null);
+                }
+
+                return (0, apiResult?.Message ?? "Không thể khởi tạo bài thi.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"--- LỖI KẾT NỐI START EXERCISE: {ex.Message} ---");
-                return (0, "Không thể kết nối tới máy chủ.");
+                // Log lỗi thật sự ra Console để debug
+                Console.WriteLine($"--- DEBUG START EXERCISE ERROR: {ex.ToString()}");
+                return (0, "Lỗi kết nối hoặc dữ liệu không hợp lệ.");
             }
         }
 

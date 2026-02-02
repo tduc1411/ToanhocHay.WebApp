@@ -12,7 +12,7 @@ namespace ToanHocHay.WebApp.Models.DTOs
         public int StudentId { get; set; }
         public int ExerciseId { get; set; }
         public string? ExerciseName { get; set; }
-        public string? ExerciseType { get; set; }
+        public int ExerciseType { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public int? DurationMinutes { get; set; }
