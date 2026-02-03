@@ -360,14 +360,14 @@
     </footer>
     <div id="chatbot-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
         <div id="chat-window" class="hidden mb-4 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
-            <div class="bg-primary p-4 flex justify-between items-center text-white">
+            <div class="bg-[#2563EB] p-4 flex justify-between items-center text-white">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-robot"></i>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-robot text-lg"></i>
                     </div>
                     <div>
-                        <p class="font-bold text-sm">Hỗ trợ ToanHocHay</p>
-                        <p class="text-[10px] text-blue-100 italic">Thường trả lời ngay lập tức</p>
+                        <p class="font-black text-sm tracking-tight">Hỗ trợ ToanHocHay</p>
+                        <p class="text-[10px] text-blue-100 font-bold uppercase tracking-widest opacity-80">Trợ lý AI 24/7</p>
                     </div>
                 </div>
                 <button onclick="toggleChat()" class="hover:bg-white/10 w-8 h-8 rounded-full transition-colors">
@@ -399,46 +399,52 @@
         </button>
     </div>
 
-    <!-- Chatbot Notification Popup -->
+    <!-- Chatbot Notification Popup (Updated Styles to match Frontend) -->
     <div id="chatbot-notification" class="fixed bottom-24 right-6 z-[9998] max-w-sm transform transition-all duration-500 ease-out translate-y-0 opacity-0 pointer-events-none">
-        <div class="bg-white rounded-2xl shadow-2xl border border-blue-100 overflow-hidden">
-            <!-- Header with gradient -->
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex items-center justify-between">
+        <div class="bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden">
+            <!-- Header -->
+            <div class="p-5 flex items-center justify-between border-b border-gray-50">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center animate-pulse">
-                        <i class="fa-solid fa-robot text-white text-lg"></i>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center animate-pulse shadow-inner">
+                        <i class="fa-solid fa-robot text-xl"></i>
                     </div>
                     <div>
-                        <p class="font-bold text-white text-sm">Chào mừng bạn! 👋</p>
-                        <p class="text-xs text-blue-100">Trợ lý AI ToanHocHay</p>
+                        <p class="font-black text-slate-900 text-base leading-none mb-1">Chào mừng bạn! 👋</p>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Trợ lý AI ToanHocHay</p>
                     </div>
                 </div>
-                <button onclick="closeChatbotNotification()" class="text-white/80 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="closeChatbotNotification()" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             
             <!-- Body -->
-            <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
-                <p class="text-gray-700 text-sm mb-3 leading-relaxed">
-                    Mình là trợ lý AI của ToanHocHay, sẵn sàng hỗ trợ bạn 24/7! 🤖
+            <div class="p-6">
+                <p class="text-slate-500 text-base mb-4 leading-relaxed font-medium">
+                    Mình là trợ lý AI của ToanHocHay, ứng dụng trí tuệ nhân tạo (AI) giúp bạn hiểu sâu – nhớ lâu – tiến bộ từng ngày! 🤖
                 </p>
-                <ul class="space-y-2 mb-4">
-                    <li class="flex items-start gap-2 text-xs text-gray-600">
-                        <i class="fa-solid fa-check-circle text-green-500 mt-0.5"></i>
-                        <span>Giải đáp thắc mắc về toán học</span>
-                    </li>
-                    <li class="flex items-start gap-2 text-xs text-gray-600">
-                        <i class="fa-solid fa-check-circle text-green-500 mt-0.5"></i>
-                        <span>Hướng dẫn sử dụng website</span>
-                    </li>
-                    <li class="flex items-start gap-2 text-xs text-gray-600">
-                        <i class="fa-solid fa-check-circle text-green-500 mt-0.5"></i>
-                        <span>Gợi ý bài học phù hợp</span>
-                    </li>
-                </ul>
-                <button onclick="openChatFromNotification()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2.5 rounded-lg font-bold text-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-comment-dots mr-2"></i>
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-check text-green-500 text-[10px]"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-500">Giải đáp thắc mắc về toán học</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-check text-green-500 text-[10px]"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-500">Hướng dẫn sử dụng website</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-check text-green-500 text-[10px]"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-500">Gợi ý bài học phù hợp</span>
+                    </div>
+                </div>
+                <button onclick="openChatFromNotification()" class="w-full bg-[#2563EB] hover:bg-blue-700 text-white py-3.5 rounded-2xl font-black text-sm shadow-xl shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-comment-dots text-lg"></i>
                     Bắt đầu trò chuyện
                 </button>
             </div>
@@ -550,21 +556,18 @@
             }, 300);
         }
 
-        // Show notification on every page load
+        // Show notification ONLY on Home/Index immediately and don't auto-hide
         window.addEventListener('DOMContentLoaded', () => {
-            // Show notification after 2 seconds on every page load
-            setTimeout(() => {
-                const notification = document.getElementById('chatbot-notification');
+            const isHomePage = "@currentController" === "Home" && "@currentAction" === "Index";
+            const notification = document.getElementById('chatbot-notification');
+            
+            if (isHomePage && notification) {
+                // Show immediately when home page is loaded
                 notification.classList.add('show');
-            }, 2000);
-
-            // Auto-hide after 15 seconds
-            setTimeout(() => {
-                const notification = document.getElementById('chatbot-notification');
-                if (notification.classList.contains('show')) {
-                    closeChatbotNotification();
-                }
-            }, 17000);
+            } else if (notification) {
+                // Hide on other pages
+                notification.style.display = 'none';
+            }
         });
     </script>
     <script>
