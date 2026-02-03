@@ -26,7 +26,7 @@
         handleBotResponse(data);
     }
 
-    // --- TRIGGER: WAIT 15 SECONDS (if no interaction) ---
+    // --- TRIGGER: WAIT 5 MINUTES (if no interaction) ---
     let waitTimer = setTimeout(() => {
         if (!hasUserInteracted && !triggersSent.wait_15s) {
             fetch('/Chat/Trigger', {
@@ -38,25 +38,47 @@
                 handleBotResponse(data);
             });
         }
-    }, 15000); // 15 seconds
+    }, 300000); // 5 minutes (300,000ms)
 
-    // --- TRIGGER: SCROLL 70% ---
+    // --- TRIGGER: SCROLL 70% (with debounce to prevent multiple API calls) ---
+    let scrollDebounceTimer = null;
+    let isScrollTriggerProcessing = false;
+
     window.addEventListener('scroll', () => {
-        if (triggersSent.scroll_70) return;
+        // Return early if already triggered or currently processing
+        if (triggersSent.scroll_70 || isScrollTriggerProcessing) return;
 
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrolled = (window.scrollY / scrollHeight) * 100;
-
-        if (scrolled >= 70 && !triggersSent.scroll_70) {
-            fetch('/Chat/Trigger', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ trigger: 'scroll_70' })
-            }).then(r => r.json()).then(data => {
-                triggersSent.scroll_70 = true;
-                handleBotResponse(data);
-            });
+        // Clear previous debounce timer
+        if (scrollDebounceTimer) {
+            clearTimeout(scrollDebounceTimer);
         }
+
+        // Debounce: wait 200ms after user stops scrolling
+        scrollDebounceTimer = setTimeout(() => {
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = (window.scrollY / scrollHeight) * 100;
+
+            if (scrolled >= 70 && !triggersSent.scroll_70 && !isScrollTriggerProcessing) {
+                isScrollTriggerProcessing = true; // Lock to prevent duplicate calls
+
+                fetch('/Chat/Trigger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ trigger: 'scroll_70' })
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        triggersSent.scroll_70 = true;
+                        handleBotResponse(data);
+                    })
+                    .catch(error => {
+                        console.error('[Chatbot] Scroll trigger error:', error);
+                    })
+                    .finally(() => {
+                        isScrollTriggerProcessing = false; // Unlock after request completes
+                    });
+            }
+        }, 200); // Wait 200ms after scrolling stops
     });
 
     // --- MARK USER INTERACTION ---

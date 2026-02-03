@@ -32,7 +32,7 @@ namespace ToanHocHay.WebApp.Services
         private void AddAuthHeader()
         {
             var token = _httpContextAccessor.HttpContext?.Session.GetString("Token");
-            if (!string.IsNullOrEmpty(token))
+             if (!string.IsNullOrEmpty(token))
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
@@ -133,12 +133,24 @@ namespace ToanHocHay.WebApp.Services
         }
 
         // 4. Nộp từng câu trả lời (Ajax/Realtime)
-        public async Task<bool> SubmitSingleAnswer(SubmitAnswerRequestDto dto)
+        /*public async Task<bool> SubmitSingleAnswer(SubmitAnswerRequestDto dto)
         {
             try
             {
                 AddAuthHeader();
                 var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/submit-answer", dto);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }*/
+
+        // 4. Nộp từng câu trả lời (Ajax/Realtime) (Updated for SubmitSingleAnswer)
+        public async Task<bool> SaveSingleAnswer(SubmitAnswerRequestDto dto)
+        {
+            try
+            {
+                AddAuthHeader();
+                var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/save-answer", dto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
