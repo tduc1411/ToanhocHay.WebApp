@@ -168,7 +168,6 @@
                         </div>
 
                         <div class="flex items-center gap-3 flex-shrink-0">
-                            <div class="h-6 w-px bg-gray-200 mx-1 hidden md:block"></div>
                             <div class="flex items-center gap-3 flex-shrink-0">
                                 <div class="h-6 w-px bg-gray-200 mx-1 hidden md:block"></div>
 
@@ -196,12 +195,33 @@
                                         </button>
 
                                         @* Dropdown menu khi hover vào Avatar (chỉ còn Hồ sơ & Đăng xuất cho gọn) *@
-                                        <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                                            <a href="/Student/Profile" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-blue-50 transition-all">
-                                                <i class="fa-solid fa-user-gear w-5"></i> Hồ sơ
+                                        <div class="dropdown-menu absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                                            @* Phân loại Đại số *@
+                                            <a href="/Course?type=DaiSo" class="flex items-center justify-between gap-3 px-4 py-4 text-sm hover:bg-blue-50 transition-all border-b border-gray-50 group/item">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center group-hover/item:bg-blue-600 group-hover/item:text-white transition-all">
+                                                        <i class="fa-solid fa-calculator"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-black text-gray-800">Đại số 6</p>
+                                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Số học & Biểu thức</p>
+                                                    </div>
+                                                </div>
+                                                <i class="fa-solid fa-chevron-right text-[10px] text-gray-300"></i>
                                             </a>
-                                            <a href="/Account/Logout" class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50">
-                                                <i class="fa-solid fa-right-from-bracket w-5"></i> Đăng xuất
+
+                                            @* Phân loại Hình học *@
+                                            <a href="/Course?type=HinhHoc" class="flex items-center justify-between gap-3 px-4 py-4 text-sm hover:bg-indigo-50 transition-all group/item">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center group-hover/item:bg-indigo-600 group-hover/item:text-white transition-all">
+                                                        <i class="fa-solid fa-draw-polygon"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-black text-gray-800">Hình học 6</p>
+                                                        <p class="text-[10px] text-gray-400 font-bold uppercase">Trực quan & Phẳng</p>
+                                                    </div>
+                                                </div>
+                                                <i class="fa-solid fa-chevron-right text-[10px] text-gray-300"></i>
                                             </a>
                                         </div>
                                     </div>
@@ -237,6 +257,34 @@
                                     <span>Bài giảng</span>
                                     <i class="fa-solid fa-chevron-down text-xs ml-1 transition-transform duration-300 group-hover:rotate-180"></i>
                                 </a>
+
+                                @* Dropdown chỉ hiện 2 mục: Đại số & Hình học *@
+                                <div class="dropdown-menu absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+
+                                    @* Mục 1: Đại số *@
+                                    <a href="/Course?type=DaiSo" class="flex items-center gap-4 px-5 py-4 hover:bg-blue-50 transition-all border-b border-gray-50 group/item">
+                                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center group-hover/item:bg-blue-600 group-hover/item:text-white transition-all shadow-sm">
+                                            <i class="fa-solid fa-calculator text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-black text-gray-800 text-sm">Đại số 6</p>
+                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Số học & Biểu thức</p>
+                                        </div>
+                                    </a>
+
+                                    @* Mục 2: Hình học *@
+                                    <a href="/Course?type=HinhHoc" class="flex items-center gap-4 px-5 py-4 hover:bg-indigo-50 transition-all group/item">
+                                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center group-hover/item:bg-indigo-600 group-hover/item:text-white transition-all shadow-sm">
+                                            <i class="fa-solid fa-draw-polygon text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-black text-gray-800 text-sm">Hình học 6</p>
+                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Hình học trực quan</p>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </li>
 
                                 @await Component.InvokeAsync("Menu")
                             </li>
