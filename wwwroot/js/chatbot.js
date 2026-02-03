@@ -196,8 +196,8 @@
         msgWrapper.className = sender === 'user' ? 'flex justify-end mb-4' : 'flex gap-3 mb-4';
 
         const contentClass = sender === 'user'
-            ? 'bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none text-sm shadow-md max-w-[75%]'
-            : 'bg-white text-gray-800 p-3 rounded-2xl rounded-tl-none shadow-md text-sm max-w-[75%] border border-gray-100';
+            ? 'bg-[#2563EB] text-white p-3.5 rounded-2xl rounded-tr-none text-sm shadow-md max-w-[75%] font-medium'
+            : 'bg-white text-slate-700 p-3.5 rounded-2xl rounded-tl-none shadow-md text-sm max-w-[75%] border border-gray-100 font-medium';
 
         const avatarHtml = sender === 'bot'
             ? `<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg flex-shrink-0"><i class="fa-solid fa-robot text-sm"></i></div>`
