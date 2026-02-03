@@ -66,7 +66,7 @@ namespace ToanHocHay.WebApp.Controllers
 
             // Bước A: Gửi từng câu trả lời về Backend
             // Sử dụng Task.WhenAll để gửi song song tất cả đáp án thay vì gửi lần lượt (giúp chạy nhanh hơn)
-            var tasks = payload.Answers.Select(ans => _examService.SubmitSingleAnswer(new SubmitAnswerRequestDto
+            var tasks = payload.Answers.Select(ans => _examService.SaveSingleAnswer(new SubmitAnswerRequestDto
             {
                 AttemptId = payload.AttemptId,
                 QuestionId = ans.QuestionId,

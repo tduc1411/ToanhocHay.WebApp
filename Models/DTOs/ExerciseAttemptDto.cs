@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace ToanHocHay.WebApp.Models.DTOs
 {
+    public enum AttemptStatus
+    {
+        InProgress,
+        Submitted,
+        Timeout
+    }
+
     /// <summary>
     /// DTO chứa thông tin lượt làm bài trả về từ API cho WebApp
     /// </summary>
@@ -14,8 +21,13 @@ namespace ToanHocHay.WebApp.Models.DTOs
         public string? ExerciseName { get; set; }
         public int ExerciseType { get; set; }
         public DateTime StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
-        public int? DurationMinutes { get; set; }
+        // Thời điểm PHẢI kết thúc (đếm giờ)
+        public DateTime PlannedEndTime { get; set; }
+
+        // Thời điểm thực sự nộp bài (null nếu chưa submit)
+        public DateTime? SubmittedAt { get; set; }
+
+        public int Status { get; set; }
         public int TotalQuestions { get; set; }
         public bool IsCompleted { get; set; }
 
@@ -29,7 +41,7 @@ namespace ToanHocHay.WebApp.Models.DTOs
     {
         public int QuestionId { get; set; }
         public string? QuestionText { get; set; }
-        public string? QuestionType { get; set; }
+        public int QuestionType { get; set; }
         public double Score { get; set; }
         public string? ImageUrl { get; set; }
         public List<AnswerOptionDto> Options { get; set; } = new();
