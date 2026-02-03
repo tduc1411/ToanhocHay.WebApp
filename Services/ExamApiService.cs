@@ -107,12 +107,12 @@ namespace ToanHocHay.WebApp.Services
                 var response = await _httpClient.PostAsJsonAsync($"{ApiConstant.apiBaseUrl}/api/ExerciseAttempts/start", payload, _jsonOptions);
                 var resString = await response.Content.ReadAsStringAsync();
 
-                if (!response.IsSuccessStatusCode)
+                /*if (!response.IsSuccessStatusCode && response.Message)
                 {
                     // In ra log để xem Backend thực sự báo lỗi gì (Ví dụ: 401 Unauthorized)
                     Console.WriteLine($"--- LỖI BACKEND: {resString}");
                     return (0, "Máy chủ từ chối yêu cầu (có thể do hết hạn phiên làm việc).");
-                }
+                }*/
 
                 // Dùng dynamic hoặc kiểm tra kỹ Data null
                 var apiResult = JsonSerializer.Deserialize<ApiResponse<ExerciseAttemptDto>>(resString, _jsonOptions);
